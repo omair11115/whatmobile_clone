@@ -131,36 +131,33 @@ async function startServer() {
   // Seed Data Endpoint
   app.post("/api/admin/seed", async (req, res) => {
     try {
-      // Clear existing data (optional, but good for clean seed)
-      // await pool.query('DELETE FROM mobiles');
-      // await pool.query('DELETE FROM posts');
-
       const dummyMobiles = [
         {
           id: uuidv4(),
-          name: 'Tecno Camon 50 Pro',
-          brand: 'Tecno',
-          slug: 'tecno-camon-50-pro',
-          price: '85999',
+          name: 'Xiaomi Redmi Note 15 Pro',
+          brand: 'Xiaomi',
+          slug: 'xiaomi-redmi-note-15-pro',
+          price: '94999',
           currency: 'Rs.',
           launch_date: 'Mar 2026',
-          images: JSON.stringify(['https://picsum.photos/seed/camon50/400/600']),
+          images: JSON.stringify(['https://picsum.photos/seed/redmi15/400/600']),
           specs: JSON.stringify({
-            os: 'Android 16 OS',
-            dimensions: '162.4 x 77 x 7.4 mm',
-            weight: '190g',
-            processor: 'Mediatek Helio G200 Ultimate (6 nm)',
-            display: '6.78 Inches, Curved AMOLED, 144Hz',
-            ram: '8GB RAM',
-            storage: '256GB Built-in',
-            camera: '50 MP Main + 50 MP Telephoto + 8 MP Ultrawide',
-            battery: '6150 mAh, 45W wired'
+            build: { os: 'Android 15 OS', ui: 'HyperOS 2.0', dimensions: '163.2 x 76.2 x 7.69 mm', weight: '195 g', sim: 'Dual SIM', colors: 'Titanium Color, Glacier Blue, Black' },
+            frequency: { '2g': 'GSM 850 / 900 / 1800 / 1900', '3g': 'HSDPA 850 / 900 / 2100', '4g': 'LTE' },
+            processor: { cpu: '2.6 Ghz Octa Core', chipset: 'MediaTek Helio G200-Ultra', gpu: 'Mali-G615 MC2' },
+            display: { technology: 'AMOLED', size: '6.77 Inches', resolution: '1080 x 2392 Pixels', protection: 'Gorilla Glass Victus 2', extra: '120Hz, 3200 nits' },
+            memory: { builtin: '256GB Built-in, 8GB RAM', card: 'No' },
+            camera: { main: '200 MP + 8 MP', features: 'HDR, Panorama', front: '20 MP' },
+            connectivity: { wlan: 'Wi-Fi 6', bluetooth: 'v5.4', gps: 'Yes', radio: 'FM', usb: 'Type-C 2.0', nfc: 'Yes', infrared: 'Yes', data: '4G LTE' },
+            features: { sensors: 'Fingerprint, Gyro', audio: 'Dual Speaker', browser: 'HTML5', messaging: 'SMS, MMS', games: 'Built-in', torch: 'Yes', extra: 'IP68/IP69K' },
+            battery: { capacity: '6500 mAh', extra: '45W Wired' },
+            price: { pkr: '94,999', usd: '291' }
           }),
-          description: 'Tecno Camon 50 Pro is the latest flagship from Tecno with a focus on photography and high-speed display.',
-          seo_title: 'Tecno Camon 50 Pro Price in Pakistan & Specs',
-          seo_description: 'Check out Tecno Camon 50 Pro price in Pakistan and full specifications.',
-          category: 'flagship',
-          features: JSON.stringify(['144Hz Display', '50MP Telephoto', '6150mAh Battery'])
+          description: 'Xiaomi Redmi Note 15 Pro detailed specifications...',
+          seo_title: 'Xiaomi Redmi Note 15 Pro Price in Pakistan & Specs',
+          seo_description: 'Check out Xiaomi Redmi Note 15 Pro price in Pakistan and full specifications.',
+          category: 'mid-range',
+          features: JSON.stringify(['200MP Camera', '6500mAh Battery', 'HyperOS 2.0'])
         },
         {
           id: uuidv4(),
@@ -172,15 +169,16 @@ async function startServer() {
           launch_date: 'Jan 2026',
           images: JSON.stringify(['https://picsum.photos/seed/s26u/400/600']),
           specs: JSON.stringify({
-            os: 'Android 16',
-            dimensions: '162.3 x 79.0 x 8.6 mm',
-            weight: '232g',
-            processor: 'Snapdragon 8 Gen 5',
-            display: '6.8 Inches Dynamic AMOLED 2X',
-            ram: '16GB',
-            storage: '512GB',
-            camera: '200MP Quad Camera',
-            battery: '5000mAh'
+            build: { os: 'Android 16', ui: 'One UI 8', dimensions: '162.3 x 79.0 x 8.6 mm', weight: '232g', sim: 'Dual SIM', colors: 'Titanium Black' },
+            frequency: { '2g': 'Yes', '3g': 'Yes', '4g': 'Yes', '5g': 'Yes' },
+            processor: { cpu: 'Octa-core', chipset: 'Snapdragon 8 Gen 5', gpu: 'Adreno 840' },
+            display: { technology: 'Dynamic AMOLED 2X', size: '6.8 Inches', resolution: '1440 x 3120', protection: 'Gorilla Armor', extra: '120Hz' },
+            memory: { builtin: '512GB, 16GB RAM', card: 'No' },
+            camera: { main: '200MP Quad', features: '100x Zoom', front: '12MP' },
+            connectivity: { wlan: 'Wi-Fi 7', bluetooth: 'v5.4', gps: 'Yes', radio: 'No', usb: 'Type-C 3.2', nfc: 'Yes', infrared: 'No', data: '5G' },
+            features: { sensors: 'Fingerprint', audio: 'Stereo', browser: 'HTML5', messaging: 'SMS', games: 'Yes', torch: 'Yes', extra: 'S-Pen' },
+            battery: { capacity: '5000mAh', extra: '45W' },
+            price: { pkr: '424,999', usd: '1,499' }
           }),
           description: 'The ultimate Samsung flagship for 2026.',
           seo_title: 'Samsung Galaxy S26 Ultra Price in Pakistan',
@@ -198,43 +196,22 @@ async function startServer() {
           launch_date: 'Feb 2026',
           images: JSON.stringify(['https://picsum.photos/seed/note60/400/600']),
           specs: JSON.stringify({
-            os: 'Android 15',
-            processor: 'Helio G99 Ultimate',
-            display: '6.78 Inches AMOLED',
-            ram: '8GB',
-            storage: '256GB',
-            camera: '108MP Triple',
-            battery: '5000mAh'
+            build: { os: 'Android 15', ui: 'XOS 14', dimensions: '164.4 x 76.8 x 7.8 mm', weight: '190g', sim: 'Dual SIM', colors: 'Magic Gold' },
+            frequency: { '2g': 'Yes', '3g': 'Yes', '4g': 'Yes' },
+            processor: { cpu: 'Octa-core', chipset: 'Helio G99 Ultimate', gpu: 'Mali-G57 MC2' },
+            display: { technology: 'AMOLED', size: '6.78 Inches', resolution: '1080 x 2460', protection: 'Gorilla Glass 5', extra: '120Hz' },
+            memory: { builtin: '256GB, 8GB RAM', card: 'microSDXC' },
+            camera: { main: '108MP Triple', features: 'Quad-LED flash', front: '32MP' },
+            connectivity: { wlan: 'Wi-Fi 5', bluetooth: 'v5.2', gps: 'Yes', radio: 'FM', usb: 'Type-C 2.0', nfc: 'Yes', infrared: 'No', data: '4G' },
+            features: { sensors: 'Fingerprint', audio: 'Stereo', browser: 'HTML5', messaging: 'SMS', games: 'Yes', torch: 'Yes', extra: 'JBL Audio' },
+            battery: { capacity: '5000mAh', extra: '45W' },
+            price: { pkr: '84,999', usd: '260' }
           }),
           description: 'Great value for money from Infinix.',
           seo_title: 'Infinix Note 60 Specs & Price',
           seo_description: 'Infinix Note 60 full details.',
-          category: 'mid-range',
-          features: JSON.stringify(['120Hz', 'Fast Charging'])
-        },
-        {
-          id: uuidv4(),
-          name: 'Vivo Y31d',
-          brand: 'Vivo',
-          slug: 'vivo-y31d',
-          price: '57999',
-          currency: 'Rs.',
-          launch_date: 'Dec 2025',
-          images: JSON.stringify(['https://picsum.photos/seed/y31d/400/600']),
-          specs: JSON.stringify({
-            os: 'Android 14',
-            processor: 'Snapdragon 480',
-            display: '6.58 Inches LCD',
-            ram: '6GB',
-            storage: '128GB',
-            camera: '13MP Dual',
-            battery: '5000mAh'
-          }),
-          description: 'Budget friendly 5G phone from Vivo.',
-          seo_title: 'Vivo Y31d Price in Pakistan',
-          seo_description: 'Vivo Y31d specs.',
           category: 'budget',
-          features: JSON.stringify(['5G', 'Large Battery'])
+          features: JSON.stringify(['108MP Camera', 'AMOLED Display', '45W Charging'])
         }
       ];
 

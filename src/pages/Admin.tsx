@@ -178,7 +178,7 @@ export function Admin() {
       currency: editingMobile.currency || 'Rs.',
       launchDate: editingMobile.launchDate || new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
       images: Array.isArray(editingMobile.images) ? editingMobile.images : [],
-      specs: editingMobile.specs || { display: '', camera: '', battery: '', processor: '', ram: '', storage: '', os: '' },
+      specs: editingMobile.specs || {},
       features: Array.isArray(editingMobile.features) ? editingMobile.features : [],
       category: editingMobile.category || 'mid-range',
       seoTitle: editingMobile.seoTitle || `${editingMobile.name} Price in Pakistan & Specs`,
@@ -290,7 +290,28 @@ export function Admin() {
           <TabsContent value="mobiles" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold text-[#1a3a5a]">Manage Mobile Phones</h2>
-              <Button size="sm" onClick={() => setEditingMobile({ name: '', brand: '', slug: '', price: '', currency: '$', specs: { display: '', camera: '', battery: '', processor: '', ram: '', storage: '', os: '' }, features: [], images: [] })}>
+              <Button size="sm" onClick={() => setEditingMobile({
+                name: '',
+                brand: '',
+                slug: '',
+                price: '',
+                currency: 'Rs.',
+                category: 'mid-range',
+                images: [],
+                features: [],
+                specs: {
+                  build: { os: '', ui: '', dimensions: '', weight: '', sim: '', colors: '' },
+                  frequency: { '2g': '', '3g': '', '4g': '', '5g': '' },
+                  processor: { cpu: '', chipset: '', gpu: '' },
+                  display: { technology: '', size: '', resolution: '', protection: '', extra: '' },
+                  memory: { builtin: '', card: '' },
+                  camera: { main: '', features: '', front: '' },
+                  connectivity: { wlan: '', bluetooth: '', gps: '', radio: '', usb: '', nfc: '', infrared: '', data: '' },
+                  features: { sensors: '', audio: '', browser: '', messaging: '', games: '', torch: '', extra: '' },
+                  battery: { capacity: '', extra: '' },
+                  price: { pkr: '', usd: '' }
+                }
+              })}>
                 <Plus className="h-4 w-4 mr-2" /> Add New Mobile
               </Button>
             </div>
@@ -316,16 +337,8 @@ export function Admin() {
                         <Input value={editingMobile.slug} onChange={e => setEditingMobile({...editingMobile, slug: e.target.value})} required />
                       </div>
                       <div className="space-y-2">
-                        <Label>Price (Numeric)</Label>
+                        <Label>Price (Numeric Display)</Label>
                         <Input value={editingMobile.price} onChange={e => setEditingMobile({...editingMobile, price: e.target.value})} required />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Currency</Label>
-                        <Input value={editingMobile.currency || 'Rs.'} onChange={e => setEditingMobile({...editingMobile, currency: e.target.value})} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Launch Date</Label>
-                        <Input value={editingMobile.launchDate || ''} onChange={e => setEditingMobile({...editingMobile, launchDate: e.target.value})} placeholder="e.g. Mar 2026" />
                       </div>
                       <div className="space-y-2">
                         <Label>Category</Label>
@@ -341,42 +354,246 @@ export function Admin() {
                       </div>
                     </div>
 
+                    {/* BUILD SECTION */}
                     <div className="space-y-4 border-t pt-4">
-                      <h3 className="text-sm font-bold uppercase">Specifications</h3>
+                      <h3 className="text-sm font-bold uppercase text-primary">Build</h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                          <Label>Display</Label>
-                          <Input value={editingMobile.specs?.display || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...(editingMobile.specs || {} as any), display: e.target.value}})} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Processor</Label>
-                          <Input value={editingMobile.specs?.processor || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...(editingMobile.specs || {} as any), processor: e.target.value}})} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>RAM</Label>
-                          <Input value={editingMobile.specs?.ram || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...(editingMobile.specs || {} as any), ram: e.target.value}})} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Storage</Label>
-                          <Input value={editingMobile.specs?.storage || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...(editingMobile.specs || {} as any), storage: e.target.value}})} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Camera</Label>
-                          <Input value={editingMobile.specs?.camera || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...(editingMobile.specs || {} as any), camera: e.target.value}})} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Battery</Label>
-                          <Input value={editingMobile.specs?.battery || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...(editingMobile.specs || {} as any), battery: e.target.value}})} />
-                        </div>
-                        <div className="space-y-2">
                           <Label>OS</Label>
-                          <Input value={editingMobile.specs?.os || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...(editingMobile.specs || {} as any), os: e.target.value}})} />
+                          <Input value={editingMobile.specs?.build?.os || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, build: {...editingMobile.specs!.build, os: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>UI</Label>
+                          <Input value={editingMobile.specs?.build?.ui || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, build: {...editingMobile.specs!.build, ui: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Dimensions</Label>
+                          <Input value={editingMobile.specs?.build?.dimensions || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, build: {...editingMobile.specs!.build, dimensions: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Weight</Label>
+                          <Input value={editingMobile.specs?.build?.weight || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, build: {...editingMobile.specs!.build, weight: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>SIM</Label>
+                          <Input value={editingMobile.specs?.build?.sim || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, build: {...editingMobile.specs!.build, sim: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Colors</Label>
+                          <Input value={editingMobile.specs?.build?.colors || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, build: {...editingMobile.specs!.build, colors: e.target.value}}})} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* FREQUENCY SECTION */}
+                    <div className="space-y-4 border-t pt-4">
+                      <h3 className="text-sm font-bold uppercase text-primary">Frequency</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>2G Band</Label>
+                          <Input value={editingMobile.specs?.frequency?.['2g'] || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, frequency: {...editingMobile.specs!.frequency, '2g': e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>3G Band</Label>
+                          <Input value={editingMobile.specs?.frequency?.['3g'] || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, frequency: {...editingMobile.specs!.frequency, '3g': e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>4G Band</Label>
+                          <Input value={editingMobile.specs?.frequency?.['4g'] || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, frequency: {...editingMobile.specs!.frequency, '4g': e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>5G Band</Label>
+                          <Input value={editingMobile.specs?.frequency?.['5g'] || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, frequency: {...editingMobile.specs!.frequency, '5g': e.target.value}}})} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* PROCESSOR SECTION */}
+                    <div className="space-y-4 border-t pt-4">
+                      <h3 className="text-sm font-bold uppercase text-primary">Processor</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>CPU</Label>
+                          <Input value={editingMobile.specs?.processor?.cpu || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, processor: {...editingMobile.specs!.processor, cpu: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Chipset</Label>
+                          <Input value={editingMobile.specs?.processor?.chipset || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, processor: {...editingMobile.specs!.processor, chipset: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>GPU</Label>
+                          <Input value={editingMobile.specs?.processor?.gpu || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, processor: {...editingMobile.specs!.processor, gpu: e.target.value}}})} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* DISPLAY SECTION */}
+                    <div className="space-y-4 border-t pt-4">
+                      <h3 className="text-sm font-bold uppercase text-primary">Display</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>Technology</Label>
+                          <Input value={editingMobile.specs?.display?.technology || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, display: {...editingMobile.specs!.display, technology: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Size</Label>
+                          <Input value={editingMobile.specs?.display?.size || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, display: {...editingMobile.specs!.display, size: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Resolution</Label>
+                          <Input value={editingMobile.specs?.display?.resolution || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, display: {...editingMobile.specs!.display, resolution: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Protection</Label>
+                          <Input value={editingMobile.specs?.display?.protection || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, display: {...editingMobile.specs!.display, protection: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Extra Features</Label>
+                          <Input value={editingMobile.specs?.display?.extra || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, display: {...editingMobile.specs!.display, extra: e.target.value}}})} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* MEMORY SECTION */}
+                    <div className="space-y-4 border-t pt-4">
+                      <h3 className="text-sm font-bold uppercase text-primary">Memory</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Built-in</Label>
+                          <Input value={editingMobile.specs?.memory?.builtin || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, memory: {...editingMobile.specs!.memory, builtin: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Card Slot</Label>
+                          <Input value={editingMobile.specs?.memory?.card || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, memory: {...editingMobile.specs!.memory, card: e.target.value}}})} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CAMERA SECTION */}
+                    <div className="space-y-4 border-t pt-4">
+                      <h3 className="text-sm font-bold uppercase text-primary">Camera</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>Main Camera</Label>
+                          <Input value={editingMobile.specs?.camera?.main || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, camera: {...editingMobile.specs!.camera, main: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Features</Label>
+                          <Input value={editingMobile.specs?.camera?.features || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, camera: {...editingMobile.specs!.camera, features: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Front Camera</Label>
+                          <Input value={editingMobile.specs?.camera?.front || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, camera: {...editingMobile.specs!.camera, front: e.target.value}}})} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CONNECTIVITY SECTION */}
+                    <div className="space-y-4 border-t pt-4">
+                      <h3 className="text-sm font-bold uppercase text-primary">Connectivity</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>WLAN</Label>
+                          <Input value={editingMobile.specs?.connectivity?.wlan || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, connectivity: {...editingMobile.specs!.connectivity, wlan: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Bluetooth</Label>
+                          <Input value={editingMobile.specs?.connectivity?.bluetooth || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, connectivity: {...editingMobile.specs!.connectivity, bluetooth: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>GPS</Label>
+                          <Input value={editingMobile.specs?.connectivity?.gps || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, connectivity: {...editingMobile.specs!.connectivity, gps: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Radio</Label>
+                          <Input value={editingMobile.specs?.connectivity?.radio || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, connectivity: {...editingMobile.specs!.connectivity, radio: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>USB</Label>
+                          <Input value={editingMobile.specs?.connectivity?.usb || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, connectivity: {...editingMobile.specs!.connectivity, usb: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>NFC</Label>
+                          <Input value={editingMobile.specs?.connectivity?.nfc || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, connectivity: {...editingMobile.specs!.connectivity, nfc: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Infrared</Label>
+                          <Input value={editingMobile.specs?.connectivity?.infrared || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, connectivity: {...editingMobile.specs!.connectivity, infrared: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Data</Label>
+                          <Input value={editingMobile.specs?.connectivity?.data || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, connectivity: {...editingMobile.specs!.connectivity, data: e.target.value}}})} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* FEATURES SECTION */}
+                    <div className="space-y-4 border-t pt-4">
+                      <h3 className="text-sm font-bold uppercase text-primary">Features</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>Sensors</Label>
+                          <Input value={editingMobile.specs?.features?.sensors || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, features: {...editingMobile.specs!.features, sensors: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Audio</Label>
+                          <Input value={editingMobile.specs?.features?.audio || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, features: {...editingMobile.specs!.features, audio: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Browser</Label>
+                          <Input value={editingMobile.specs?.features?.browser || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, features: {...editingMobile.specs!.features, browser: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Messaging</Label>
+                          <Input value={editingMobile.specs?.features?.messaging || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, features: {...editingMobile.specs!.features, messaging: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Games</Label>
+                          <Input value={editingMobile.specs?.features?.games || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, features: {...editingMobile.specs!.features, games: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Torch</Label>
+                          <Input value={editingMobile.specs?.features?.torch || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, features: {...editingMobile.specs!.features, torch: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2 md:col-span-3">
+                          <Label>Extra Features</Label>
+                          <Textarea value={editingMobile.specs?.features?.extra || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, features: {...editingMobile.specs!.features, extra: e.target.value}}})} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* BATTERY SECTION */}
+                    <div className="space-y-4 border-t pt-4">
+                      <h3 className="text-sm font-bold uppercase text-primary">Battery</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Capacity</Label>
+                          <Input value={editingMobile.specs?.battery?.capacity || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, battery: {...editingMobile.specs!.battery, capacity: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Extra (Charging, etc.)</Label>
+                          <Input value={editingMobile.specs?.battery?.extra || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, battery: {...editingMobile.specs!.battery, extra: e.target.value}}})} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* PRICE SECTION */}
+                    <div className="space-y-4 border-t pt-4">
+                      <h3 className="text-sm font-bold uppercase text-primary">Price Details</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Price in Rs.</Label>
+                          <Input value={editingMobile.specs?.price?.pkr || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, price: {...editingMobile.specs!.price, pkr: e.target.value}}})} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Price in USD</Label>
+                          <Input value={editingMobile.specs?.price?.usd || ''} onChange={e => setEditingMobile({...editingMobile, specs: {...editingMobile.specs!, price: {...editingMobile.specs!.price, usd: e.target.value}}})} />
                         </div>
                       </div>
                     </div>
 
                     <div className="space-y-4 border-t pt-4">
-                      <h3 className="text-sm font-bold uppercase">Media & Features</h3>
+                      <h3 className="text-sm font-bold uppercase">Media & SEO</h3>
                       <div className="space-y-2">
                         <Label>Image URLs (Comma separated)</Label>
                         <Input 
@@ -386,18 +603,6 @@ export function Admin() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label>Features (Comma separated)</Label>
-                        <Input 
-                          value={editingMobile.features?.join(', ') || ''} 
-                          onChange={e => setEditingMobile({...editingMobile, features: e.target.value.split(',').map(s => s.trim())})} 
-                          placeholder="Fast Charging, 5G, AI Camera"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-4 border-t pt-4">
-                      <h3 className="text-sm font-bold uppercase">SEO & Content</h3>
-                      <div className="space-y-2">
                         <Label>SEO Title</Label>
                         <Input value={editingMobile.seoTitle || ''} onChange={e => setEditingMobile({...editingMobile, seoTitle: e.target.value})} />
                       </div>
@@ -406,7 +611,7 @@ export function Admin() {
                         <Textarea value={editingMobile.seoDescription || ''} onChange={e => setEditingMobile({...editingMobile, seoDescription: e.target.value})} />
                       </div>
                       <div className="space-y-2">
-                        <Label>Description</Label>
+                        <Label>Main Description</Label>
                         <Textarea className="h-32" value={editingMobile.description} onChange={e => setEditingMobile({...editingMobile, description: e.target.value})} />
                       </div>
                     </div>

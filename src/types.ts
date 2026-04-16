@@ -1,12 +1,66 @@
 export interface MobileSpec {
-  display: string;
-  camera: string;
-  battery: string;
-  processor: string;
-  ram: string;
-  storage: string;
-  os: string;
-  [key: string]: string;
+  build: {
+    os: string;
+    ui: string;
+    dimensions: string;
+    weight: string;
+    sim: string;
+    colors: string;
+  };
+  frequency: {
+    '2g': string;
+    '3g': string;
+    '4g': string;
+    '5g'?: string;
+  };
+  processor: {
+    cpu: string;
+    chipset: string;
+    gpu: string;
+  };
+  display: {
+    technology: string;
+    size: string;
+    resolution: string;
+    protection: string;
+    extra: string;
+  };
+  memory: {
+    builtin: string;
+    card: string;
+  };
+  camera: {
+    main: string;
+    features: string;
+    front: string;
+  };
+  connectivity: {
+    wlan: string;
+    bluetooth: string;
+    gps: string;
+    radio: string;
+    usb: string;
+    nfc: string;
+    infrared: string;
+    data: string;
+  };
+  features: {
+    sensors: string;
+    audio: string;
+    browser: string;
+    messaging: string;
+    games: string;
+    torch: string;
+    extra: string;
+  };
+  battery: {
+    capacity: string;
+    extra: string;
+  };
+  price: {
+    pkr: string;
+    usd: string;
+  };
 }
 
 export interface Mobile {
