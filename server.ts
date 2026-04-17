@@ -3,7 +3,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
-import pool from './db.js';
+import pool from './db';
 import { v4 as uuidv4 } from 'uuid';
 import { GoogleGenAI, Type } from "@google/genai";
 
@@ -18,6 +18,121 @@ async function startServer() {
   const PORT = 3000;
 
   app.use(express.json());
+
+  // Global API Logger
+  app.use("/api", (req, res, next) => {
+    console.log(`[API Request] ${req.method} ${req.originalUrl}`);
+    next();
+  });
+
+  // Diagnostic Route
+  app.get("/api/test-brands", (req, res) => {
+    res.json({ message: "Brands API section is loaded" });
+  });
+
+  // BRAND MANAGEMENT
+  app.get("/api/brands", async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM brands ORDER BY name ASC');
+      res.json(result.rows);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post("/api/brands", async (req, res) => {
+    console.log("POST /api/brands reached", req.body);
+    const { name, slug, logo, description } = req.body;
+    const id = uuidv4();
+    try {
+      const result = await pool.query(
+        'INSERT INTO brands (id, name, slug, logo, description) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [id, name, slug, logo, description]
+      );
+      console.log("Brand created successfully:", result.rows[0].id);
+      res.status(201).json(result.rows[0]);
+    } catch (err: any) {
+      console.error("Error creating brand:", err.message);
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  app.put("/api/brands/:id", async (req, res) => {
+    const { name, slug, logo, description } = req.body;
+    try {
+      const result = await pool.query(
+        'UPDATE brands SET name = $1, slug = $2, logo = $3, description = $4 WHERE id = $5 RETURNING *',
+        [name, slug, logo, description, req.params.id]
+      );
+      res.json(result.rows[0]);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  app.delete("/api/brands/:id", async (req, res) => {
+    try {
+      await pool.query('DELETE FROM brands WHERE id = $1', [req.params.id]);
+      res.json({ message: "Brand deleted successfully" });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // PRICE RANGE MANAGEMENT
+  app.get("/api/price-ranges", async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM price_ranges ORDER BY min_price ASC');
+      res.json(result.rows.map((r: any) => ({
+        id: r.id,
+        label: r.label,
+        minPrice: r.min_price,
+        maxPrice: r.max_price,
+        currency: r.currency
+      })));
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post("/api/price-ranges", async (req, res) => {
+    console.log("POST /api/price-ranges reached", req.body);
+    const { label, minPrice, maxPrice, currency } = req.body;
+    const id = uuidv4();
+    try {
+      const result = await pool.query(
+        'INSERT INTO price_ranges (id, label, min_price, max_price, currency) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [id, label, minPrice, maxPrice, currency || 'Rs.']
+      );
+      console.log("Price range created successfully:", result.rows[0].id);
+      res.status(201).json(result.rows[0]);
+    } catch (err: any) {
+      console.error("Error creating price range:", err.message);
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  app.put("/api/price-ranges/:id", async (req, res) => {
+    const { label, minPrice, maxPrice, currency } = req.body;
+    try {
+      const result = await pool.query(
+        'UPDATE price_ranges SET label = $1, min_price = $2, max_price = $3, currency = $4 WHERE id = $5 RETURNING *',
+        [label, minPrice, maxPrice, currency, req.params.id]
+      );
+      res.json(result.rows[0]);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  app.delete("/api/price-ranges/:id", async (req, res) => {
+    try {
+      await pool.query('DELETE FROM price_ranges WHERE id = $1', [req.params.id]);
+      res.json({ message: "Price range deleted successfully" });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
 
   // API routes
   app.get("/api/health", (req, res) => {
@@ -126,104 +241,8 @@ async function startServer() {
     }
   });
 
-  // Brand Management
-  app.get("/api/brands", async (req, res) => {
-    try {
-      const result = await pool.query('SELECT * FROM brands ORDER BY name ASC');
-      res.json(result.rows);
-    } catch (err: any) {
-      res.status(500).json({ error: err.message });
-    }
-  });
-
-  app.post("/api/brands", async (req, res) => {
-    const { name, slug, logo, description } = req.body;
-    const id = uuidv4();
-    try {
-      const result = await pool.query(
-        'INSERT INTO brands (id, name, slug, logo, description) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [id, name, slug, logo, description]
-      );
-      res.status(201).json(result.rows[0]);
-    } catch (err: any) {
-      res.status(400).json({ error: err.message });
-    }
-  });
-
-  app.put("/api/brands/:id", async (req, res) => {
-    const { name, slug, logo, description } = req.body;
-    try {
-      const result = await pool.query(
-        'UPDATE brands SET name = $1, slug = $2, logo = $3, description = $4 WHERE id = $5 RETURNING *',
-        [name, slug, logo, description, req.params.id]
-      );
-      res.json(result.rows[0]);
-    } catch (err: any) {
-      res.status(400).json({ error: err.message });
-    }
-  });
-
-  app.delete("/api/brands/:id", async (req, res) => {
-    try {
-      await pool.query('DELETE FROM brands WHERE id = $1', [req.params.id]);
-      res.json({ message: "Brand deleted successfully" });
-    } catch (err: any) {
-      res.status(500).json({ error: err.message });
-    }
-  });
-
-  // Price Range Management
-  app.get("/api/price-ranges", async (req, res) => {
-    try {
-      const result = await pool.query('SELECT * FROM price_ranges ORDER BY min_price ASC');
-      res.json(result.rows.map((r: any) => ({
-        id: r.id,
-        label: r.label,
-        minPrice: r.min_price,
-        maxPrice: r.max_price,
-        currency: r.currency
-      })));
-    } catch (err: any) {
-      res.status(500).json({ error: err.message });
-    }
-  });
-
-  app.post("/api/price-ranges", async (req, res) => {
-    const { label, minPrice, maxPrice, currency } = req.body;
-    const id = uuidv4();
-    try {
-      const result = await pool.query(
-        'INSERT INTO price_ranges (id, label, min_price, max_price, currency) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [id, label, minPrice, maxPrice, currency || 'Rs.']
-      );
-      res.status(201).json(result.rows[0]);
-    } catch (err: any) {
-      res.status(400).json({ error: err.message });
-    }
-  });
-
-  app.put("/api/price-ranges/:id", async (req, res) => {
-    const { label, minPrice, maxPrice, currency } = req.body;
-    try {
-      const result = await pool.query(
-        'UPDATE price_ranges SET label = $1, min_price = $2, max_price = $3, currency = $4 WHERE id = $5 RETURNING *',
-        [label, minPrice, maxPrice, currency, req.params.id]
-      );
-      res.json(result.rows[0]);
-    } catch (err: any) {
-      res.status(400).json({ error: err.message });
-    }
-  });
-
-  app.delete("/api/price-ranges/:id", async (req, res) => {
-    try {
-      await pool.query('DELETE FROM price_ranges WHERE id = $1', [req.params.id]);
-      res.json({ message: "Price range deleted successfully" });
-    } catch (err: any) {
-      res.status(500).json({ error: err.message });
-    }
-  });
-
+  // BRAND MANAGEMENT REMOVED FROM HERE
+  // PRICE RANGE MANAGEMENT REMOVED FROM HERE
   app.get("/api/mobiles/:slug", async (req, res) => {
     try {
       const result = await pool.query('SELECT * FROM mobiles WHERE slug = $1', [req.params.slug]);
@@ -539,6 +558,12 @@ async function startServer() {
     // This would normally trigger a scraper or API fetch
     // For now, we'll return a success message
     res.json({ message: "Sync triggered successfully" });
+  });
+
+  // API 404 Handler
+  app.use("/api/*", (req, res) => {
+    console.warn(`[API 404] No match for: ${req.method} ${req.originalUrl}`);
+    res.status(404).json({ error: `API route ${req.method} ${req.originalUrl} not found` });
   });
 
   // Vite middleware for development

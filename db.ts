@@ -5,7 +5,17 @@ const { Pool } = pg;
 if (!process.env.DATABASE_URL) {
   console.error("❌ DATABASE_URL is NOT detected. Please check your .env file in the root directory.");
 } else {
-  console.log("✅ Database URL detected.");
+  try {
+    const dbUrl = process.env.DATABASE_URL;
+    if (dbUrl && dbUrl.includes('://')) {
+      const host = new URL(dbUrl).hostname;
+      console.log(`✅ Database host detected: ${host}`);
+    } else {
+      console.log("✅ Database URL detected (non-standard format).");
+    }
+  } catch (e) {
+    console.log("✅ Database URL detected.");
+  }
 }
 
 // Use environment variable for connection string
