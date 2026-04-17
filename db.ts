@@ -36,6 +36,7 @@ const initDb = async () => {
     const client = await pool.connect();
     try {
       await client.query(`
+        -- ... existing CREATE TABLE statements ...
         CREATE TABLE IF NOT EXISTS mobiles (
           id UUID PRIMARY KEY,
           name TEXT NOT NULL,
@@ -82,6 +83,17 @@ const initDb = async () => {
           max_price INTEGER NOT NULL,
           currency TEXT DEFAULT 'Rs.'
         );
+
+        -- Migration: Add slug column to brands if missing
+        DO $$ 
+        BEGIN 
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='brands' AND column_name='slug') THEN
+                ALTER TABLE brands ADD COLUMN slug TEXT;
+                UPDATE brands SET slug = LOWER(REPLACE(name, ' ', '-')) WHERE slug IS NULL;
+                ALTER TABLE brands ALTER COLUMN slug SET NOT NULL;
+                ALTER TABLE brands ADD CONSTRAINT brands_slug_key UNIQUE (slug);
+            END IF;
+        END $$;
       `);
       console.log("PostgreSQL tables initialized");
     } finally {
