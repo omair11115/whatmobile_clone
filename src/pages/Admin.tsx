@@ -84,6 +84,15 @@ export function Admin() {
     }
   };
 
+  const slugify = (text: string) => {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -457,7 +466,15 @@ export function Admin() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Mobile Name</Label>
-                        <Input value={editingMobile.name} onChange={e => setEditingMobile({...editingMobile, name: e.target.value})} required />
+                        <Input 
+                          value={editingMobile.name} 
+                          onChange={e => {
+                            const name = e.target.value;
+                            const slug = slugify(name);
+                            setEditingMobile({...editingMobile, name, slug});
+                          }} 
+                          required 
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label>Brand</Label>
@@ -860,7 +877,15 @@ export function Admin() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Post Title</Label>
-                        <Input value={editingPost.title} onChange={e => setEditingPost({...editingPost, title: e.target.value})} required />
+                        <Input 
+                          value={editingPost.title} 
+                          onChange={e => {
+                            const title = e.target.value;
+                            const slug = slugify(title);
+                            setEditingPost({...editingPost, title, slug});
+                          }} 
+                          required 
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label>Slug</Label>

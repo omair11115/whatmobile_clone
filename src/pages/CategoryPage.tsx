@@ -4,6 +4,7 @@ import { PhoneCard } from '@/src/components/PhoneCard';
 import { Sidebar } from '@/src/components/Sidebar';
 import { SEO } from '@/src/components/SEO';
 import { Mobile } from '@/src/types';
+import { CATEGORIES } from '@/src/constants';
 
 export function CategoryPage() {
   const { type, slug } = useParams();
@@ -24,6 +25,9 @@ export function CategoryPage() {
         if (type === 'brand') {
           apiUrl += `?brand=${slug}`;
           pageTitle = `${slug?.toUpperCase()} Mobiles`;
+        } else if (type === 'category') {
+          apiUrl += `?category=${slug}`;
+          pageTitle = CATEGORIES.find(c => c.id === slug)?.name || `${slug?.toUpperCase()} Mobiles`;
         } else if (isPriceRange) {
           const min = searchParams.get('min');
           const max = searchParams.get('max');

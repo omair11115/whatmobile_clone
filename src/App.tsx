@@ -7,6 +7,7 @@ import { PhoneDetail } from '@/src/pages/PhoneDetail';
 import { Admin } from '@/src/pages/Admin';
 import { Search } from '@/src/pages/Search';
 import { CategoryPage } from '@/src/pages/CategoryPage';
+import { BlogDetail } from '@/src/pages/BlogDetail';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/phone/:slug" element={<PhoneDetail />} />
+              <Route path="/blog/:slug" element={<BlogDetail />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/search" element={<Search />} />
               <Route path="/:type/:slug" element={<CategoryPage />} />

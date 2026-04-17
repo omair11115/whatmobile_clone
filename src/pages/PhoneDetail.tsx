@@ -63,8 +63,8 @@ export function PhoneDetail() {
     }
   };
 
-  const pkrPrice = phone.specs?.price?.pkr || (parseInt(phone.price.toString().replace(/,/g, '')) * 200).toLocaleString();
-  const usdPrice = phone.specs?.price?.usd || phone.price;
+  const pkrPrice = phone.specs?.price?.pkr || phone.price.toLocaleString();
+  const usdPrice = phone.specs?.price?.usd || (parseInt(phone.price.toString().replace(/,/g, '')) / 280).toFixed(0);
 
   const renderSpecRow = (label: string, value: string | undefined) => {
     if (!value) return null;

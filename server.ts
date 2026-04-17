@@ -422,7 +422,7 @@ async function startServer() {
   });
 
   app.get("/api/mobiles", async (req, res) => {
-    const { brand, minPrice, maxPrice, network, ram, screen_size, os, feature } = req.query;
+    const { brand, minPrice, maxPrice, network, ram, screen_size, os, feature, category } = req.query;
     try {
       let query = 'SELECT * FROM mobiles';
       const params: any[] = [];
@@ -431,6 +431,11 @@ async function startServer() {
       if (brand) {
         conditions.push(`brand ILIKE $${params.length + 1}`);
         params.push(brand);
+      }
+
+      if (category) {
+        conditions.push(`category = $${params.length + 1}`);
+        params.push(category);
       }
 
       if (minPrice) {
@@ -485,8 +490,20 @@ async function startServer() {
   // PRICE RANGE MANAGEMENT REMOVED FROM HERE
   app.get("/api/mobiles/:slug", async (req, res) => {
     try {
-      const result = await pool.query('SELECT * FROM mobiles WHERE slug = $1', [req.params.slug]);
+      const slug = req.params.slug;
+      const result = await pool.query('SELECT * FROM mobiles WHERE LOWER(slug) = LOWER($1)', [slug]);
       if (result.rows.length === 0) return res.status(404).json({ error: "Mobile not found" });
+      res.json(result.rows[0]);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get("/api/posts/:slug", async (req, res) => {
+    try {
+      const slug = req.params.slug;
+      const result = await pool.query('SELECT * FROM posts WHERE LOWER(slug) = LOWER($1)', [slug]);
+      if (result.rows.length === 0) return res.status(404).json({ error: "Post not found" });
       res.json(result.rows[0]);
     } catch (err: any) {
       res.status(500).json({ error: err.message });

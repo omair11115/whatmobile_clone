@@ -63,30 +63,30 @@ export function Home() {
 
   const displayPhones = phones;
 
-  // Grouping by price for sections (Simulating PKR for UI)
+  // Grouping by price for sections
   const pkr50kPlus = displayPhones.filter(p => {
     const price = parseInt(p.price.toString().replace(/,/g, ''));
-    return price > 500; // Mocking > 50k
+    return price > 50000; 
   });
   
   const pkr40kTo50k = displayPhones.filter(p => {
     const price = parseInt(p.price.toString().replace(/,/g, ''));
-    return price <= 500 && price > 400;
+    return price <= 50000 && price > 40000;
   });
 
   const pkr30kTo40k = displayPhones.filter(p => {
     const price = parseInt(p.price.toString().replace(/,/g, ''));
-    return price <= 400 && price > 300;
+    return price <= 40000 && price > 30000;
   });
 
   const pkr20kTo30k = displayPhones.filter(p => {
     const price = parseInt(p.price.toString().replace(/,/g, ''));
-    return price <= 300 && price > 200;
+    return price <= 30000 && price > 20000;
   });
 
   const pkrUnder10k = displayPhones.filter(p => {
     const price = parseInt(p.price.toString().replace(/,/g, ''));
-    return price <= 100;
+    return price <= 10000;
   });
 
   const comingSoon = displayPhones.slice(0, 4); 
@@ -233,7 +233,7 @@ export function Home() {
                           <a href={`/phone/${phone.slug}`} className="text-[#1a3a5a] hover:text-primary">{phone.name}</a>
                         </td>
                         <td className="px-4 py-2 text-xs text-right font-bold text-[#d32f2f]">
-                          Rs. {parseInt(phone.price.toString().replace(/,/g, '')) * 200}
+                          {phone.currency} {phone.price.toLocaleString()}
                         </td>
                       </tr>
                     ))}
