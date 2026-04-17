@@ -155,6 +155,19 @@ async function startServer() {
     }
   });
 
+  app.put("/api/networks/:id", async (req, res) => {
+    const { name, slug } = req.body;
+    try {
+      const result = await pool.query(
+        'UPDATE networks SET name = $1, slug = $2 WHERE id = $3 RETURNING *',
+        [name, slug, req.params.id]
+      );
+      res.json(result.rows[0]);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
   app.delete("/api/networks/:id", async (req, res) => {
     try {
       await pool.query('DELETE FROM networks WHERE id = $1', [req.params.id]);
@@ -180,6 +193,19 @@ async function startServer() {
     try {
       const result = await pool.query('INSERT INTO ram_options (id, label, slug) VALUES ($1, $2, $3) RETURNING *', [id, label, slug]);
       res.status(201).json(result.rows[0]);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  app.put("/api/ram-options/:id", async (req, res) => {
+    const { label, slug } = req.body;
+    try {
+      const result = await pool.query(
+        'UPDATE ram_options SET label = $1, slug = $2 WHERE id = $3 RETURNING *',
+        [label, slug, req.params.id]
+      );
+      res.json(result.rows[0]);
     } catch (err: any) {
       res.status(400).json({ error: err.message });
     }
@@ -215,6 +241,19 @@ async function startServer() {
     }
   });
 
+  app.put("/api/screen-sizes/:id", async (req, res) => {
+    const { label, slug } = req.body;
+    try {
+      const result = await pool.query(
+        'UPDATE screen_sizes SET label = $1, slug = $2 WHERE id = $3 RETURNING *',
+        [label, slug, req.params.id]
+      );
+      res.json(result.rows[0]);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
   app.delete("/api/screen-sizes/:id", async (req, res) => {
     try {
       await pool.query('DELETE FROM screen_sizes WHERE id = $1', [req.params.id]);
@@ -245,6 +284,19 @@ async function startServer() {
     }
   });
 
+  app.put("/api/mobile-features/:id", async (req, res) => {
+    const { label, slug } = req.body;
+    try {
+      const result = await pool.query(
+        'UPDATE mobile_features SET label = $1, slug = $2 WHERE id = $3 RETURNING *',
+        [label, slug, req.params.id]
+      );
+      res.json(result.rows[0]);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
   app.delete("/api/mobile-features/:id", async (req, res) => {
     try {
       await pool.query('DELETE FROM mobile_features WHERE id = $1', [req.params.id]);
@@ -270,6 +322,19 @@ async function startServer() {
     try {
       const result = await pool.query('INSERT INTO os_options (id, name, slug) VALUES ($1, $2, $3) RETURNING *', [id, name, slug]);
       res.status(201).json(result.rows[0]);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  app.put("/api/os-options/:id", async (req, res) => {
+    const { name, slug } = req.body;
+    try {
+      const result = await pool.query(
+        'UPDATE os_options SET name = $1, slug = $2 WHERE id = $3 RETURNING *',
+        [name, slug, req.params.id]
+      );
+      res.json(result.rows[0]);
     } catch (err: any) {
       res.status(400).json({ error: err.message });
     }
@@ -357,7 +422,7 @@ async function startServer() {
   });
 
   app.get("/api/mobiles", async (req, res) => {
-    const { brand, minPrice, maxPrice } = req.query;
+    const { brand, minPrice, maxPrice, network, ram, screen_size, os, feature } = req.query;
     try {
       let query = 'SELECT * FROM mobiles';
       const params: any[] = [];
@@ -376,6 +441,31 @@ async function startServer() {
       if (maxPrice) {
         conditions.push(`CAST(price AS INTEGER) <= $${params.length + 1}`);
         params.push(maxPrice);
+      }
+
+      if (network) {
+        conditions.push(`network = $${params.length + 1}`);
+        params.push(network);
+      }
+
+      if (ram) {
+        conditions.push(`ram = $${params.length + 1}`);
+        params.push(ram);
+      }
+
+      if (screen_size) {
+        conditions.push(`screen_size = $${params.length + 1}`);
+        params.push(screen_size);
+      }
+
+      if (os) {
+        conditions.push(`os = $${params.length + 1}`);
+        params.push(os);
+      }
+
+      if (feature) {
+        conditions.push(`features @> $${params.length + 1}::jsonb`);
+        params.push(JSON.stringify([feature]));
       }
 
       if (conditions.length > 0) {

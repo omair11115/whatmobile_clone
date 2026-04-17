@@ -6,8 +6,7 @@ import { Home } from '@/src/pages/Home';
 import { PhoneDetail } from '@/src/pages/PhoneDetail';
 import { Admin } from '@/src/pages/Admin';
 import { Search } from '@/src/pages/Search';
-import { BrandPage } from '@/src/pages/BrandPage';
-import { PriceRangePage } from '@/src/pages/PriceRangePage';
+import { CategoryPage } from '@/src/pages/CategoryPage';
 
 export default function App() {
   return (
@@ -21,9 +20,8 @@ export default function App() {
               <Route path="/phone/:slug" element={<PhoneDetail />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/search" element={<Search />} />
-              <Route path="/brand/:brandSlug" element={<BrandPage />} />
-              <Route path="/price-range" element={<PriceRangePage />} />
-              {/* Add more routes as needed */}
+              <Route path="/:type/:slug" element={<CategoryPage />} />
+              <Route path="/price-range" element={<CategoryPage />} />
               <Route path="*" element={<Home />} />
             </Routes>
           </main>
