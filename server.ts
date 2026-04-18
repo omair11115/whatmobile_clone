@@ -13,9 +13,41 @@ const __dirname = path.dirname(__filename);
 // Initialize Gemini AI (Server-side only)
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
+const slugify = (text: string) => {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
+async function fixExistingSlugs() {
+  try {
+    const mobilesResult = await pool.query("SELECT id, slug FROM mobiles WHERE slug LIKE '% %'");
+    for (const row of mobilesResult.rows) {
+      const cleanSlug = slugify(row.slug);
+      await pool.query("UPDATE mobiles SET slug = $1 WHERE id = $2", [cleanSlug, row.id]);
+      console.log(`Fixed mobile slug: ${row.slug} -> ${cleanSlug}`);
+    }
+    const postsResult = await pool.query("SELECT id, slug FROM posts WHERE slug LIKE '% %'");
+    for (const row of postsResult.rows) {
+      const cleanSlug = slugify(row.slug);
+      await pool.query("UPDATE posts SET slug = $1 WHERE id = $2", [cleanSlug, row.id]);
+      console.log(`Fixed post slug: ${row.slug} -> ${cleanSlug}`);
+    }
+  } catch (err) {
+    console.error("Migration error:", err);
+  }
+}
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Run migrations
+  await fixExistingSlugs();
 
   app.use(express.json());
 
@@ -490,8 +522,13 @@ async function startServer() {
   // PRICE RANGE MANAGEMENT REMOVED FROM HERE
   app.get("/api/mobiles/:slug", async (req, res) => {
     try {
-      const slug = req.params.slug;
-      const result = await pool.query('SELECT * FROM mobiles WHERE LOWER(slug) = LOWER($1)', [slug]);
+      const rawSlug = req.params.slug;
+      const cleanSlug = slugify(rawSlug);
+      // Try exact match then slugified match
+      const result = await pool.query(
+        'SELECT * FROM mobiles WHERE LOWER(slug) = LOWER($1) OR LOWER(slug) = LOWER($2) LIMIT 1', 
+        [rawSlug, cleanSlug]
+      );
       if (result.rows.length === 0) return res.status(404).json({ error: "Mobile not found" });
       res.json(result.rows[0]);
     } catch (err: any) {
@@ -501,8 +538,13 @@ async function startServer() {
 
   app.get("/api/posts/:slug", async (req, res) => {
     try {
-      const slug = req.params.slug;
-      const result = await pool.query('SELECT * FROM posts WHERE LOWER(slug) = LOWER($1)', [slug]);
+      const rawSlug = req.params.slug;
+      const cleanSlug = slugify(rawSlug);
+      // Try exact match then slugified match
+      const result = await pool.query(
+        'SELECT * FROM posts WHERE LOWER(slug) = LOWER($1) OR LOWER(slug) = LOWER($2) LIMIT 1', 
+        [rawSlug, cleanSlug]
+      );
       if (result.rows.length === 0) return res.status(404).json({ error: "Post not found" });
       res.json(result.rows[0]);
     } catch (err: any) {
@@ -513,6 +555,7 @@ async function startServer() {
   app.post("/api/mobiles", async (req, res) => {
     const { name, brand, slug, price, currency, launchDate, images, specs, description, seoTitle, seoDescription, category, features, network, ram, screen_size, os } = req.body;
     const id = uuidv4();
+    const cleanSlug = slugify(slug || name);
     
     try {
       const query = `
@@ -520,7 +563,7 @@ async function startServer() {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
         RETURNING id, slug
       `;
-      const values = [id, name, brand, slug, price, currency, launchDate, JSON.stringify(images), JSON.stringify(specs), description, seoTitle, seoDescription, category, JSON.stringify(features), network, ram, screen_size, os];
+      const values = [id, name, brand, cleanSlug, price, currency, launchDate, JSON.stringify(images), JSON.stringify(specs), description, seoTitle, seoDescription, category, JSON.stringify(features), network, ram, screen_size, os];
       const result = await pool.query(query, values);
       res.status(201).json(result.rows[0]);
     } catch (error: any) {
@@ -765,6 +808,7 @@ async function startServer() {
   // Mobile Management
   app.put("/api/mobiles/:id", async (req, res) => {
     const { name, brand, slug, price, currency, launchDate, images, specs, description, seoTitle, seoDescription, category, features, network, ram, screen_size, os } = req.body;
+    const cleanSlug = slugify(slug || name);
     try {
       const query = `
         UPDATE mobiles 
@@ -774,7 +818,7 @@ async function startServer() {
         WHERE id = $18
         RETURNING id, slug
       `;
-      const values = [name, brand, slug, price, currency, launchDate, JSON.stringify(images), JSON.stringify(specs), description, seoTitle, seoDescription, category, JSON.stringify(features), network, ram, screen_size, os, req.params.id];
+      const values = [name, brand, cleanSlug, price, currency, launchDate, JSON.stringify(images), JSON.stringify(specs), description, seoTitle, seoDescription, category, JSON.stringify(features), network, ram, screen_size, os, req.params.id];
       const result = await pool.query(query, values);
       if (result.rows.length === 0) return res.status(404).json({ error: "Mobile not found" });
       res.json(result.rows[0]);
@@ -796,6 +840,7 @@ async function startServer() {
   // Post Management
   app.put("/api/posts/:id", async (req, res) => {
     const { title, slug, content, author, image, tags, seoTitle, seoDescription } = req.body;
+    const cleanSlug = slugify(slug || title);
     try {
       const query = `
         UPDATE posts 
@@ -804,7 +849,7 @@ async function startServer() {
         WHERE id = $9
         RETURNING id, slug
       `;
-      const values = [title, slug, content, author, image, JSON.stringify(tags), seoTitle, seoDescription, req.params.id];
+      const values = [title, cleanSlug, content, author, image, JSON.stringify(tags), seoTitle, seoDescription, req.params.id];
       const result = await pool.query(query, values);
       if (result.rows.length === 0) return res.status(404).json({ error: "Post not found" });
       res.json(result.rows[0]);
@@ -835,6 +880,7 @@ async function startServer() {
   app.post("/api/posts", async (req, res) => {
     const { title, slug, content, author, image, tags, seoTitle, seoDescription } = req.body;
     const id = uuidv4();
+    const cleanSlug = slugify(slug || title);
     
     try {
       const query = `
@@ -842,7 +888,7 @@ async function startServer() {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING id, slug
       `;
-      const values = [id, title, slug, content, author, image, JSON.stringify(tags), seoTitle, seoDescription];
+      const values = [id, title, cleanSlug, content, author, image, JSON.stringify(tags), seoTitle, seoDescription];
       const result = await pool.query(query, values);
       res.status(201).json(result.rows[0]);
     } catch (error: any) {
