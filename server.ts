@@ -605,14 +605,17 @@ async function startServer() {
   app.get("/api/posts/brand/:brand", async (req, res) => {
     try {
       const { brand } = req.params;
+      // Filter by brand_id (brand slug) or search in text
       const result = await pool.query(`
         SELECT * FROM posts 
-        WHERE title ILIKE $1 
-        OR content ILIKE $1 
-        OR tags::text ILIKE $1
+        WHERE brand_id = $1
+        OR brand = $1
+        OR title ILIKE $2 
+        OR content ILIKE $2 
+        OR tags::text ILIKE $2
         ORDER BY created_at DESC 
         LIMIT 4
-      `, [`%${brand}%`]);
+      `, [brand, `%${brand}%`]);
       res.json(result.rows);
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -922,17 +925,17 @@ async function startServer() {
 
   // Post Management
   app.put("/api/posts/:id", async (req, res) => {
-    const { title, slug, content, author, image, tags, seoTitle, seoDescription } = req.body;
+    const { title, slug, content, author, image, tags, seoTitle, seoDescription, brand, brand_id } = req.body;
     const cleanSlug = slugify(slug || title);
     try {
       const query = `
         UPDATE posts 
         SET title = $1, slug = $2, content = $3, author = $4, image = $5, tags = $6, 
-            seo_title = $7, seo_description = $8
-        WHERE id = $9
+            seo_title = $7, seo_description = $8, brand = $9, brand_id = $10
+        WHERE id = $11
         RETURNING id, slug
       `;
-      const values = [title, cleanSlug, content, author, image, JSON.stringify(tags), seoTitle, seoDescription, req.params.id];
+      const values = [title, cleanSlug, content, author, image, JSON.stringify(tags), seoTitle, seoDescription, brand, brand_id, req.params.id];
       const result = await pool.query(query, values);
       if (result.rows.length === 0) return res.status(404).json({ error: "Post not found" });
       res.json(result.rows[0]);
@@ -961,17 +964,17 @@ async function startServer() {
   });
 
   app.post("/api/posts", async (req, res) => {
-    const { title, slug, content, author, image, tags, seoTitle, seoDescription } = req.body;
+    const { title, slug, content, author, image, tags, seoTitle, seoDescription, brand, brand_id } = req.body;
     const id = uuidv4();
     const cleanSlug = slugify(slug || title);
     
     try {
       const query = `
-        INSERT INTO posts (id, title, slug, content, author, image, tags, seo_title, seo_description)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        INSERT INTO posts (id, title, slug, content, author, image, tags, seo_title, seo_description, brand, brand_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         RETURNING id, slug
       `;
-      const values = [id, title, cleanSlug, content, author, image, JSON.stringify(tags), seoTitle, seoDescription];
+      const values = [id, title, cleanSlug, content, author, image, JSON.stringify(tags), seoTitle, seoDescription, brand, brand_id];
       const result = await pool.query(query, values);
       res.status(201).json(result.rows[0]);
     } catch (error: any) {

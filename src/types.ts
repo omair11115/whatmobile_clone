@@ -89,6 +89,8 @@ export interface BlogPost {
   author: string;
   image: string;
   tags: string[];
+  brand?: string;
+  brand_id?: string;
   seoTitle: string;
   seoDescription: string;
   created_at: string;

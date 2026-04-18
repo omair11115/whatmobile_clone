@@ -892,9 +892,31 @@ export function Admin() {
                         <Input value={editingPost.slug} onChange={e => setEditingPost({...editingPost, slug: e.target.value})} required />
                       </div>
                     </div>
-                    <div className="space-y-2">
+                     <div className="space-y-2">
                       <Label>Content (Markdown)</Label>
                       <Textarea className="h-40" value={editingPost.content} onChange={e => setEditingPost({...editingPost, content: e.target.value})} required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Associated Brand (Optional)</Label>
+                      <select 
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        value={editingPost.brand_id || ''}
+                        onChange={(e) => {
+                          const brandId = e.target.value;
+                          const brandObj = brands.find(b => b.slug === brandId);
+                          setEditingPost({
+                            ...editingPost, 
+                            brand_id: brandId || undefined,
+                            brand: brandObj ? brandObj.name : undefined
+                          });
+                        }}
+                      >
+                        <option value="">No Brand Association</option>
+                        {brands.map(brand => (
+                          <option key={brand.id} value={brand.slug}>{brand.name}</option>
+                        ))}
+                      </select>
+                      <p className="text-[10px] text-muted-foreground">Select a brand to show this post in that brand's news section on phone detail pages.</p>
                     </div>
                     <div className="flex gap-2">
                       <Button type="submit" size="sm">Save Post</Button>
