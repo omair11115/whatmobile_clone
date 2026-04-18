@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Smartphone, Camera, Battery, Cpu, HardDrive, Monitor, Share2, Heart, Scale, Star, Zap, ChevronRight, Newspaper } from 'lucide-react';
+import { Star, ChevronRight, Newspaper } from 'lucide-react';
 import { Mobile, BlogPost } from '@/src/types';
 import { motion } from 'motion/react';
 
@@ -171,21 +171,9 @@ export function PhoneDetail() {
                     </p>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="grid grid-cols-3 gap-2">
-                    <Button variant="outline" className="text-[10px] h-8 bg-[#f8f9fa] border-[#1a3a5a]/20 text-[#1a3a5a] font-bold">
-                      <Zap className="h-3 w-3 mr-1" /> Video Review
-                    </Button>
-                    <Button variant="outline" className="text-[10px] h-8 bg-[#f8f9fa] border-[#1a3a5a]/20 text-[#1a3a5a] font-bold">
-                      <Scale className="h-3 w-3 mr-1" /> Compare
-                    </Button>
-                    <Button variant="outline" className="text-[10px] h-8 bg-[#f8f9fa] border-[#1a3a5a]/20 text-[#1a3a5a] font-bold">
-                      <Monitor className="h-3 w-3 mr-1" /> Pictures
-                    </Button>
                   </div>
                 </div>
               </div>
-            </div>
 
             {/* Detailed Specifications Table */}
             <section className="bg-white border rounded-lg shadow-sm overflow-hidden">
