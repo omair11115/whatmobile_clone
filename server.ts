@@ -1333,16 +1333,74 @@ async function startServer() {
     res.send("User-agent: *\nAllow: /\nSitemap: /sitemap.xml");
   });
 
-  app.get("/sitemap.xml", (req, res) => {
-    res.type("application/xml");
-    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+  app.get("/sitemap.xml", async (req, res) => {
+    try {
+      const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+      
+      const [mobiles, brands, posts, networks, ram, screen, os, features] = await Promise.all([
+        pool.query('SELECT slug FROM mobiles'),
+        pool.query('SELECT slug FROM brands'),
+        pool.query('SELECT slug FROM posts'),
+        pool.query('SELECT slug FROM networks'),
+        pool.query('SELECT slug FROM ram_options'),
+        pool.query('SELECT slug FROM screen_sizes'),
+        pool.query('SELECT slug FROM os_options'),
+        pool.query('SELECT slug FROM mobile_features')
+      ]);
+
+      res.type("application/xml");
+      let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>/</loc><priority>1.0</priority></url>
-  <url><loc>/brands</loc><priority>0.8</priority></url>
-  <url><loc>/news</loc><priority>0.8</priority></url>
-  <!-- In a real app, dynamically generate phone and blog URLs -->
-</urlset>`;
-    res.send(sitemap);
+  <url><loc>${baseUrl}/</loc><priority>1.0</priority></url>
+  <url><loc>${baseUrl}/news</loc><priority>0.8</priority></url>
+  <url><loc>${baseUrl}/contact</loc><priority>0.5</priority></url>`;
+
+      // Add Mobiles
+      mobiles.rows.forEach((m: any) => {
+        sitemap += `\n  <url><loc>${baseUrl}/phone/${m.slug}</loc><priority>0.9</priority></url>`;
+      });
+
+      // Add Brands
+      brands.rows.forEach((b: any) => {
+        sitemap += `\n  <url><loc>${baseUrl}/brand/${b.slug}</loc><priority>0.7</priority></url>`;
+      });
+
+      // Add Posts
+      posts.rows.forEach((p: any) => {
+        sitemap += `\n  <url><loc>${baseUrl}/blog/${p.slug}</loc><priority>0.7</priority></url>`;
+      });
+
+      // Add Networks
+      networks.rows.forEach((n: any) => {
+        sitemap += `\n  <url><loc>${baseUrl}/network/${n.slug}</loc><priority>0.6</priority></url>`;
+      });
+
+      // Add RAM
+      ram.rows.forEach((r: any) => {
+        sitemap += `\n  <url><loc>${baseUrl}/ram/${r.slug}</loc><priority>0.6</priority></url>`;
+      });
+
+      // Add Screen Sizes
+      screen.rows.forEach((s: any) => {
+        sitemap += `\n  <url><loc>${baseUrl}/screen/${s.slug}</loc><priority>0.6</priority></url>`;
+      });
+
+      // Add OS
+      os.rows.forEach((o: any) => {
+        sitemap += `\n  <url><loc>${baseUrl}/os/${o.slug}</loc><priority>0.6</priority></url>`;
+      });
+
+      // Add Features
+      features.rows.forEach((f: any) => {
+        sitemap += `\n  <url><loc>${baseUrl}/feature/${f.slug}</loc><priority>0.6</priority></url>`;
+      });
+
+      sitemap += `\n</urlset>`;
+      res.send(sitemap);
+    } catch (err) {
+      console.error("Sitemap generation error:", err);
+      res.status(500).send("Error generating sitemap");
+    }
   });
 
   // Mock automation route
