@@ -104,7 +104,7 @@ async function startServer() {
 
     baseUrl = baseUrl.replace(/\/+$/, '');
     const uri = `${baseUrl}/auth/google/callback`;
-    console.log(`[OAuth] Generated Redirect URI (Detected): ${uri}`);
+    console.log(`[OAuth DEBUG] Protocol: ${protocol}, Host: ${host}, Final URI: ${uri}`);
     return uri;
   };
 
