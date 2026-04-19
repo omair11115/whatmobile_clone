@@ -163,7 +163,8 @@ export interface User {
 
 export interface Comment {
   id: string;
-  mobile_id: string;
+  mobile_id?: string;
+  post_id?: string;
   user_id: string;
   content: string;
   parent_id?: string;

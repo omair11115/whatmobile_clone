@@ -6,8 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Zap, RefreshCw, CheckCircle2, AlertCircle, Plus, Edit2, Trash2, LogOut, Smartphone, FileText, Settings, Image as ImageIcon, Copy, Check, Search } from 'lucide-react';
+import { Zap, RefreshCw, CheckCircle2, AlertCircle, Plus, Edit2, Trash2, LogOut, Smartphone, FileText, Settings, Image as ImageIcon, Copy, Check, Search, Type } from 'lucide-react';
 import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption, GalleryImage } from '@/src/types';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 export function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -44,6 +46,16 @@ export function Admin() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const [gallerySearch, setGallerySearch] = useState('');
+
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+      ['link', 'image'],
+      ['clean']
+    ],
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -965,10 +977,18 @@ export function Admin() {
                         <Input value={editingPost.slug} onChange={e => setEditingPost({...editingPost, slug: e.target.value})} required />
                       </div>
                     </div>
-                     <div className="space-y-2">
-                      <Label>Content (Markdown)</Label>
-                      <Textarea className="h-40" value={editingPost.content} onChange={e => setEditingPost({...editingPost, content: e.target.value})} required />
-                    </div>
+                      <div className="space-y-2 pb-12">
+                        <Label>Content (Rich Text Editor)</Label>
+                        <div className="bg-white">
+                          <ReactQuill 
+                            theme="snow" 
+                            value={editingPost.content} 
+                            onChange={content => setEditingPost({...editingPost, content})}
+                            modules={quillModules}
+                          />
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">You can copy-paste images directly into the editor or use the image button.</p>
+                      </div>
                     <div className="space-y-2">
                       <Label>Associated Brand (Optional)</Label>
                       <select 

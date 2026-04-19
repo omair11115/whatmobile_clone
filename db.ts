@@ -180,6 +180,7 @@ const initDb = async () => {
           query: `CREATE TABLE IF NOT EXISTS comments (
             id TEXT PRIMARY KEY,
             mobile_id TEXT REFERENCES mobiles(id) ON DELETE CASCADE,
+            post_id TEXT REFERENCES posts(id) ON DELETE CASCADE,
             user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
             content TEXT NOT NULL,
             parent_id TEXT REFERENCES comments(id) ON DELETE CASCADE,
@@ -254,6 +255,15 @@ const initDb = async () => {
                 END IF;
                 IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='posts' AND column_name='brand_id') THEN
                     ALTER TABLE posts ADD COLUMN brand_id TEXT;
+                END IF;
+            END $$;`
+        },
+        {
+          name: 'post_comments column migration',
+          query: `DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='comments' AND column_name='post_id') THEN
+                    ALTER TABLE comments ADD COLUMN post_id TEXT;
                 END IF;
             END $$;`
         }

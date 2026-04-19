@@ -8,7 +8,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 interface CommentSectionProps {
-  mobileId: string;
+  mobileId?: string;
+  postId?: string;
   currentUser: User | null;
 }
 
@@ -106,7 +107,7 @@ const CommentItem = ({
   </div>
 );
 
-export function CommentSection({ mobileId, currentUser }: CommentSectionProps) {
+export function CommentSection({ mobileId, postId, currentUser }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -116,12 +117,14 @@ export function CommentSection({ mobileId, currentUser }: CommentSectionProps) {
 
   useEffect(() => {
     fetchComments();
-  }, [mobileId]);
+  }, [mobileId, postId]);
 
   const fetchComments = async () => {
+    if (!mobileId && !postId) return;
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/comments/${mobileId}`);
+      const url = mobileId ? `/api/comments/${mobileId}` : `/api/comments/post/${postId}`;
+      const res = await fetch(url);
       if (res.ok) {
         setComments(await res.json());
       }
@@ -148,6 +151,7 @@ export function CommentSection({ mobileId, currentUser }: CommentSectionProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mobile_id: mobileId,
+          post_id: postId,
           content: content.trim(),
           parent_id: parentId
         })

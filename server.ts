@@ -259,15 +259,53 @@ async function startServer() {
     }
   });
 
+  app.get('/api/comments/post/:post_id', async (req, res) => {
+    const { post_id } = req.params;
+    try {
+      const result = await pool.query(`
+        SELECT c.*, u.name as user_name, u.avatar as user_avatar 
+        FROM comments c 
+        JOIN users u ON c.user_id = u.id 
+        WHERE c.post_id = $1 
+        ORDER BY c.created_at DESC
+      `, [post_id]);
+      
+      const comments = result.rows.map(row => ({
+        ...row,
+        user: { name: row.user_name, avatar: row.user_avatar }
+      }));
+      
+      const commentMap = new Map();
+      const topLevelComments: any[] = [];
+
+      comments.forEach(c => {
+        c.replies = [];
+        commentMap.set(c.id, c);
+      });
+
+      comments.forEach(c => {
+        if (c.parent_id && commentMap.has(c.parent_id)) {
+          commentMap.get(c.parent_id).replies.push(c);
+        } else {
+          topLevelComments.push(c);
+        }
+      });
+
+      res.json(topLevelComments);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   app.post('/api/comments', authenticateUser, async (req: any, res) => {
-    const { mobile_id, content, parent_id } = req.body;
+    const { mobile_id, post_id, content, parent_id } = req.body;
     const user_id = req.user.id;
     const id = uuidv4();
 
     try {
       const result = await pool.query(
-        'INSERT INTO comments (id, mobile_id, user_id, content, parent_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [id, mobile_id, user_id, content, parent_id || null]
+        'INSERT INTO comments (id, mobile_id, post_id, user_id, content, parent_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        [id, mobile_id || null, post_id || null, user_id, content, parent_id || null]
       );
       res.status(201).json(result.rows[0]);
     } catch (err: any) {

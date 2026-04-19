@@ -3,13 +3,15 @@ import { useState, useEffect } from 'react';
 import { SEO } from '@/src/components/SEO';
 import { Sidebar } from '@/src/components/Sidebar';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, User, Tag, Clock } from 'lucide-react';
+import { Calendar, User as UserIcon, Tag, Clock, MessageSquare } from 'lucide-react';
 import { BlogPost } from '@/src/types';
-import ReactMarkdown from 'react-markdown';
 import { format } from 'date-fns';
+import { useAuth } from '@/src/lib/auth';
+import { CommentSection } from '@/src/components/CommentSection';
 
 export function BlogDetail() {
   const { slug } = useParams();
+  const { user } = useAuth();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -71,7 +73,7 @@ export function BlogDetail() {
                     <span>{format(new Date(post.created_at), 'MMMM dd, yyyy')}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
+                    <UserIcon className="h-4 w-4" />
                     <span>{post.author}</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -85,9 +87,10 @@ export function BlogDetail() {
                 </h1>
 
                 <div className="prose prose-slate max-w-none">
-                  <div className="markdown-body">
-                    <ReactMarkdown>{post.content}</ReactMarkdown>
-                  </div>
+                  <div 
+                    className="rich-text-content"
+                    dangerouslySetInnerHTML={{ __html: post.content }}
+                  />
                 </div>
 
                 {post.tags && post.tags.length > 0 && (
@@ -100,6 +103,13 @@ export function BlogDetail() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Discussion Section */}
+            <Card className="border-none shadow-sm overflow-hidden">
+              <CardContent className="p-8">
+                <CommentSection postId={post.id} currentUser={user} />
               </CardContent>
             </Card>
           </div>
