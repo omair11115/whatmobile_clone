@@ -9,7 +9,7 @@ interface StarRatingProps {
 }
 
 export function StarRating({ mobileId, initialRating = 0, readOnly = false }: StarRatingProps) {
-  const [rating, setRating] = useState(initialRating);
+  const [userRating, setUserRating] = useState(initialRating);
   const [hover, setHover] = useState(0);
   const [totalRatings, setTotalRatings] = useState(0);
   const [avgRating, setAvgRating] = useState(0);
@@ -26,7 +26,7 @@ export function StarRating({ mobileId, initialRating = 0, readOnly = false }: St
         const data = await res.json();
         setAvgRating(data.averageRating);
         setTotalRatings(data.totalRatings);
-        if (data.userRating) setRating(data.userRating);
+        if (data.userRating) setUserRating(data.userRating);
       }
     } catch (err) {
       console.error("Error fetching ratings:", err);
@@ -45,10 +45,9 @@ export function StarRating({ mobileId, initialRating = 0, readOnly = false }: St
       });
 
       if (res.ok) {
-        setRating(value);
+        setUserRating(value);
         fetchRatings();
       } else if (res.status === 401) {
-        // Trigger login flow
         window.dispatchEvent(new CustomEvent('TRIGGER_LOGIN'));
       }
     } catch (err) {
@@ -58,39 +57,65 @@ export function StarRating({ mobileId, initialRating = 0, readOnly = false }: St
     }
   };
 
+  const getStarFill = (starIndex: number) => {
+    if (hover > 0) return hover >= starIndex ? 100 : 0;
+    if (userRating > 0 && !hover) return userRating >= starIndex ? 100 : 0;
+    
+    // Default: Show average
+    const diff = avgRating - (starIndex - 1);
+    if (diff >= 1) return 100;
+    if (diff <= 0) return 0;
+    return diff * 100;
+  };
+
+  const getStarColor = (val: number) => {
+    if (val >= 4) return "text-[#ffc107]";
+    if (val >= 3) return "text-[#ff9800]";
+    return "text-[#ff5252]";
+  };
+
+  const activeColor = getStarColor(hover || userRating || avgRating);
+
   return (
     <div className="flex flex-col items-center">
-      <div className="flex items-center space-x-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            className={cn(
-              "transition-all duration-150 transform hover:scale-110",
-              (readOnly || isSubmitting) ? "cursor-default" : "cursor-pointer"
-            )}
-            onMouseEnter={() => !readOnly && setHover(star)}
-            onMouseLeave={() => !readOnly && setHover(0)}
-            onClick={() => handleRate(star)}
-            disabled={readOnly || isSubmitting}
-          >
-            <Star
+      <div className="flex items-center space-x-0.5">
+        {[1, 2, 3, 4, 5].map((star) => {
+          const fillPercent = getStarFill(star);
+          return (
+            <button
+              key={star}
+              type="button"
               className={cn(
-                "h-6 w-6",
-                (hover || rating) >= star 
-                  ? "fill-[#ffc107] text-[#ffc107]" 
-                  : "text-gray-300"
+                "relative transition-all duration-150 transform hover:scale-110 p-0.5",
+                (readOnly || isSubmitting) ? "cursor-default" : "cursor-pointer"
               )}
-            />
-          </button>
-        ))}
-        <span className="ml-2 text-sm font-bold text-[#1a3a5a]">
-          {avgRating > 0 ? avgRating.toFixed(1) : 'No rating'}
+              onMouseEnter={() => !readOnly && setHover(star)}
+              onMouseLeave={() => !readOnly && setHover(0)}
+              onClick={() => handleRate(star)}
+              disabled={readOnly || isSubmitting}
+            >
+              <Star className="h-5 w-5 text-gray-200 fill-gray-200" />
+              <div 
+                className="absolute inset-0 p-0.5 overflow-hidden pointer-events-none"
+                style={{ width: `${fillPercent}%` }}
+              >
+                <Star className={cn("h-5 w-5 fill-current", activeColor)} />
+              </div>
+            </button>
+          );
+        })}
+        <span className={cn("ml-2 text-base font-black", activeColor)}>
+          {avgRating > 0 ? avgRating.toFixed(1) : '0.0'}
         </span>
       </div>
-      <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold tracking-tight">
-        {totalRatings} {totalRatings === 1 ? 'Rating' : 'Ratings'}
-      </p>
+      <div className="flex items-center gap-1.5 mt-0.5">
+        <p className="text-[10px] text-muted-foreground uppercase font-black tracking-tight">
+          {totalRatings} {totalRatings === 1 ? 'Rating' : 'Ratings'}
+        </p>
+        {userRating > 0 && (
+          <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0 rounded font-bold uppercase">Your Rating: {userRating}</span>
+        )}
+      </div>
     </div>
   );
 }
