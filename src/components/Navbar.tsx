@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Menu, X, Smartphone, Newspaper, BarChart2, Moon, Sun, LogOut, User as UserIcon } from 'lucide-react';
+import { Search, Menu, X, Smartphone, Newspaper, Moon, Sun, LogOut, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -101,12 +101,6 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : null}
-            
-            <a href="/admin">
-              <Button size="icon" variant="ghost" className="text-muted-foreground">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </a>
           </div>
         </div>
 
