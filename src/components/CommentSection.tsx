@@ -21,6 +21,7 @@ interface CommentItemProps {
   setReplyContent: (content: string) => void;
   handleSubmit: (parentId?: string) => void;
   isSubmitting: boolean;
+  currentUser: User | null;
 }
 
 const CommentItem = ({ 
@@ -31,7 +32,8 @@ const CommentItem = ({
   replyContent, 
   setReplyContent, 
   handleSubmit, 
-  isSubmitting 
+  isSubmitting,
+  currentUser
 }: CommentItemProps) => (
   <div className={cn("space-y-4", depth > 0 ? "ml-8 mt-4 border-l pl-4" : "mt-6")}>
     <div className="flex space-x-3">
@@ -49,7 +51,13 @@ const CommentItem = ({
         <p className="text-sm text-gray-700 leading-relaxed">{comment.content}</p>
         <div className="pt-1">
           <button 
-            onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+            onClick={() => {
+              if (!currentUser) {
+                window.dispatchEvent(new CustomEvent('TRIGGER_LOGIN'));
+                return;
+              }
+              setReplyingTo(replyingTo === comment.id ? null : comment.id);
+            }}
             className="text-[10px] font-bold text-[#d32f2f] hover:underline flex items-center"
           >
             <Reply className="h-3 w-3 mr-1" />
@@ -90,6 +98,7 @@ const CommentItem = ({
             setReplyContent={setReplyContent}
             handleSubmit={handleSubmit}
             isSubmitting={isSubmitting}
+            currentUser={currentUser}
           />
         ))}
       </div>
@@ -174,13 +183,22 @@ export function CommentSection({ mobileId, currentUser }: CommentSectionProps) {
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Textarea 
-            placeholder={currentUser ? "Share your thoughts on this device..." : "Please login to join the discussion"}
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            disabled={!currentUser}
-            className="min-h-[100px] text-sm"
-          />
+          <div 
+            onClick={() => {
+              if (!currentUser) {
+                window.dispatchEvent(new CustomEvent('TRIGGER_LOGIN'));
+              }
+            }}
+            className={cn(!currentUser && "cursor-pointer")}
+          >
+            <Textarea 
+              placeholder={currentUser ? "Share your thoughts on this device..." : "Please login to join the discussion"}
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              disabled={!currentUser}
+              className={cn("min-h-[100px] text-sm", !currentUser && "pointer-events-none opacity-60")}
+            />
+          </div>
           <div className="flex justify-end">
             <Button 
               onClick={() => handleSubmit()} 
@@ -211,6 +229,7 @@ export function CommentSection({ mobileId, currentUser }: CommentSectionProps) {
                 setReplyContent={setReplyContent}
                 handleSubmit={handleSubmit}
                 isSubmitting={isSubmitting}
+                currentUser={currentUser}
               />
             ))}
           </div>

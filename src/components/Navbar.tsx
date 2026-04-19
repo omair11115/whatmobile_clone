@@ -102,16 +102,7 @@ export function Navbar() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => login()}
-                className="hidden lg:flex border-[#1a3a5a] text-[#1a3a5a] hover:bg-[#1a3a5a] hover:text-white font-bold rounded-full"
-              >
-                Login
-              </Button>
-            )}
+            ) : null}
             
             <a href="/admin">
               <Button size="icon" variant="ghost" className="text-muted-foreground">
