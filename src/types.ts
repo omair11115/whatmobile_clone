@@ -153,3 +153,29 @@ export interface GalleryImage {
   altText?: string;
   created_at: string;
 }
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
+export interface Comment {
+  id: string;
+  mobile_id: string;
+  user_id: string;
+  content: string;
+  parent_id?: string;
+  created_at: string;
+  user?: User;
+  replies?: Comment[];
+}
+
+export interface Rating {
+  id: string;
+  mobile_id: string;
+  user_id: string;
+  rating: number;
+  created_at: string;
+}

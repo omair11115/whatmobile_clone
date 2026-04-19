@@ -8,12 +8,14 @@ import { Admin } from '@/src/pages/Admin';
 import { Search } from '@/src/pages/Search';
 import { CategoryPage } from '@/src/pages/CategoryPage';
 import { BlogDetail } from '@/src/pages/BlogDetail';
+import { AuthProvider } from '@/src/lib/auth';
 
 export default function App() {
   return (
     <HelmetProvider>
-      <Router>
-        <div className="flex flex-col min-h-screen font-sans antialiased">
+      <AuthProvider>
+        <Router>
+          <div className="flex flex-col min-h-screen font-sans antialiased">
           <Navbar />
           <main className="flex-grow">
             <Routes>
@@ -30,6 +32,7 @@ export default function App() {
           <Footer />
         </div>
       </Router>
-    </HelmetProvider>
+    </AuthProvider>
+  </HelmetProvider>
   );
 }

@@ -6,6 +6,12 @@ import { fileURLToPath } from "url";
 import pool from './db';
 import { v4 as uuidv4 } from 'uuid';
 import { GoogleGenAI, Type } from "@google/genai";
+import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
+import cookieParser from 'cookie-parser';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret-for-dev';
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,11 +58,243 @@ async function startServer() {
   await fixExistingSlugs();
 
   app.use(express.json());
+  app.use(cookieParser());
 
   // Global API Logger
   app.use("/api", (req, res, next) => {
     console.log(`[API Request] ${req.method} ${req.originalUrl}`);
     next();
+  });
+
+  // Authentication Middleware
+  const authenticateUser = async (req: any, res: any, next: any) => {
+    const token = req.cookies.session_token;
+    if (!token) return res.status(401).json({ error: "Authentication required" });
+
+    try {
+      const decoded: any = jwt.verify(token, JWT_SECRET);
+      req.user = decoded;
+      next();
+    } catch (err) {
+      res.status(401).json({ error: "Invalid or expired session" });
+    }
+  };
+
+  // Google OAuth Routes
+  app.get('/api/auth/google/url', (req, res) => {
+    const redirectUri = `${process.env.APP_URL || 'http://localhost:3000'}/auth/google/callback`;
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${process.env.GOOGLE_CLIENT_ID}&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `response_type=code&` +
+      `scope=openid%20email%20profile`;
+    res.json({ url });
+  });
+
+  app.get('/auth/google/callback', async (req, res) => {
+    const { code } = req.query;
+    if (!code) return res.status(400).send("No code provided");
+
+    try {
+      const redirectUri = `${process.env.APP_URL || 'http://localhost:3000'}/auth/google/callback`;
+      const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          code: code as string,
+          client_id: process.env.GOOGLE_CLIENT_ID || '',
+          client_secret: process.env.GOOGLE_CLIENT_SECRET || '',
+          redirect_uri: redirectUri,
+          grant_type: 'authorization_code',
+        }),
+      });
+
+      const tokenData = await tokenRes.json();
+      const ticket = await googleClient.verifyIdToken({
+        idToken: tokenData.id_token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload) throw new Error("Invalid Google token payload");
+
+      const { sub: googleId, email, name, picture: avatar } = payload;
+
+      // Check if user exists, otherwise create
+      let userResult = await pool.query('SELECT * FROM users WHERE google_id = $1', [googleId]);
+      let user;
+
+      if (userResult.rows.length === 0) {
+        const id = uuidv4();
+        const insertResult = await pool.query(
+          'INSERT INTO users (id, google_id, email, name, avatar) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+          [id, googleId, email, name, avatar]
+        );
+        user = insertResult.rows[0];
+      } else {
+        user = userResult.rows[0];
+      }
+
+      // Create session token
+      const sessionToken = jwt.sign(
+        { id: user.id, email: user.email, name: user.name, avatar: user.avatar },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+
+      // Set secure cookie for iframe
+      res.cookie('session_token', sessionToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+
+      res.send(`
+        <html>
+          <body>
+            <script>
+              if (window.opener) {
+                window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS' }, '*');
+                window.close();
+              } else {
+                window.location.href = '/';
+              }
+            </script>
+            <p>Authentication successful. This window should close automatically.</p>
+          </body>
+        </html>
+      `);
+    } catch (err: any) {
+      console.error("Google Auth error:", err.message);
+      res.status(500).send("Authentication failed");
+    }
+  });
+
+  app.get('/api/auth/me', (req, res) => {
+    const token = req.cookies.session_token;
+    if (!token) return res.json({ user: null });
+
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      res.json({ user: decoded });
+    } catch (err) {
+      res.json({ user: null });
+    }
+  });
+
+  app.post('/api/auth/logout', (req, res) => {
+    res.clearCookie('session_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
+    res.json({ success: true });
+  });
+
+  // COMMENTS & RATINGS API
+  app.get('/api/comments/:mobile_id', async (req, res) => {
+    const { mobile_id } = req.params;
+    try {
+      const result = await pool.query(`
+        SELECT c.*, u.name as user_name, u.avatar as user_avatar 
+        FROM comments c 
+        JOIN users u ON c.user_id = u.id 
+        WHERE c.mobile_id = $1 
+        ORDER BY c.created_at DESC
+      `, [mobile_id]);
+      
+      const comments = result.rows.map(row => ({
+        ...row,
+        user: { name: row.user_name, avatar: row.user_avatar }
+      }));
+      
+      const commentMap = new Map();
+      const topLevelComments: any[] = [];
+
+      comments.forEach(c => {
+        c.replies = [];
+        commentMap.set(c.id, c);
+      });
+
+      comments.forEach(c => {
+        if (c.parent_id && commentMap.has(c.parent_id)) {
+          commentMap.get(c.parent_id).replies.push(c);
+        } else {
+          topLevelComments.push(c);
+        }
+      });
+
+      res.json(topLevelComments);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/comments', authenticateUser, async (req: any, res) => {
+    const { mobile_id, content, parent_id } = req.body;
+    const user_id = req.user.id;
+    const id = uuidv4();
+
+    try {
+      const result = await pool.query(
+        'INSERT INTO comments (id, mobile_id, user_id, content, parent_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [id, mobile_id, user_id, content, parent_id || null]
+      );
+      res.status(201).json(result.rows[0]);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  app.get('/api/ratings/:mobile_id', async (req, res) => {
+    const { mobile_id } = req.params;
+    try {
+      const result = await pool.query(`
+        SELECT 
+          COALESCE(AVG(rating), 0) as average_rating, 
+          COUNT(*) as total_ratings 
+        FROM ratings 
+        WHERE mobile_id = $1
+      `, [mobile_id]);
+      
+      let userRating = null;
+      const token = req.cookies.session_token;
+      if (token) {
+        try {
+          const decoded: any = jwt.verify(token, JWT_SECRET);
+          const userRatingResult = await pool.query(
+            'SELECT rating FROM ratings WHERE mobile_id = $1 AND user_id = $2',
+            [mobile_id, decoded.id]
+          );
+          userRating = userRatingResult.rows[0]?.rating || null;
+        } catch (e) {}
+      }
+
+      res.json({
+        averageRating: parseFloat(result.rows[0].average_rating),
+        totalRatings: parseInt(result.rows[0].total_ratings),
+        userRating
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/ratings', authenticateUser, async (req: any, res) => {
+    const { mobile_id, rating } = req.body;
+    const user_id = req.user.id;
+    const id = uuidv4();
+
+    try {
+      const result = await pool.query(
+        'INSERT INTO ratings (id, mobile_id, user_id, rating) VALUES ($1, $2, $3, $4) ON CONFLICT (mobile_id, user_id) DO UPDATE SET rating = $4 RETURNING *',
+        [id, mobile_id, user_id, rating]
+      );
+      res.status(201).json(result.rows[0]);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
   });
 
   // Diagnostic Route

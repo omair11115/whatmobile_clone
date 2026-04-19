@@ -9,9 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Star, ChevronRight, Newspaper } from 'lucide-react';
 import { Mobile, BlogPost } from '@/src/types';
 import { motion } from 'motion/react';
+import { useAuth } from '@/src/lib/auth';
+import { StarRating } from '@/src/components/StarRating';
+import { CommentSection } from '@/src/components/CommentSection';
 
 export function PhoneDetail() {
   const { slug } = useParams();
+  const { user } = useAuth();
   const [phone, setPhone] = useState<Mobile | null>(null);
   const [similarMobiles, setSimilarMobiles] = useState<Mobile[]>([]);
   const [brandMobiles, setBrandMobiles] = useState<Mobile[]>([]);
@@ -125,8 +129,8 @@ export function PhoneDetail() {
                 {/* Left: Image */}
                 <div className="md:col-span-4 flex flex-col items-center">
                   <h1 className="text-2xl font-black text-[#1a3a5a] mb-2 text-center">{phone.name}</h1>
-                  <div className="flex items-center gap-0.5 mb-4">
-                    {[1, 2, 3, 4, 5].map(s => <Star key={s} className="h-4 w-4 fill-yellow-400 text-yellow-400" />)}
+                  <div className="mb-4">
+                    <StarRating mobileId={phone.id} />
                   </div>
                   <div className="text-xs font-bold text-muted-foreground mb-4 text-center">
                     Rs. {pkrPrice} <br />
@@ -367,6 +371,11 @@ export function PhoneDetail() {
             <div className="bg-white border rounded-lg p-4 text-[10px] text-muted-foreground leading-relaxed">
               <p className="font-bold mb-2">Disclaimer.</p>
               <p>{phone.brand} {phone.name} price in Pakistan is updated daily from the price list provided by local shops and dealers but we can not guarantee that the information / price / {phone.name} Prices on this page is 100% correct (Human error is possible), always visit your local shop for exact cell phone cost & rate. {phone.brand} {phone.name} price Pakistan.</p>
+            </div>
+
+            {/* Discussion Section */}
+            <div className="bg-white border rounded-lg p-6 shadow-sm">
+              <CommentSection mobileId={phone.id} currentUser={user} />
             </div>
 
             {/* Similar Phones Section */}

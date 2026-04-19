@@ -1,11 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Menu, X, Smartphone, Newspaper, BarChart2, Moon, Sun } from 'lucide-react';
+import { Search, Menu, X, Smartphone, Newspaper, BarChart2, Moon, Sun, LogOut, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { BRANDS } from '@/src/constants';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAuth } from '@/src/lib/auth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Navbar() {
+  const { user, login, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -66,9 +76,42 @@ export function Navbar() {
               <Search className="h-5 w-5" />
             </Button>
             
-            <Button variant="outline" size="sm" className="hidden lg:flex border-[#1a3a5a] text-[#1a3a5a] hover:bg-[#1a3a5a] hover:text-white font-bold rounded-full">
-              Login
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user.avatar} alt={user.name} />
+                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => logout()}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => login()}
+                className="hidden lg:flex border-[#1a3a5a] text-[#1a3a5a] hover:bg-[#1a3a5a] hover:text-white font-bold rounded-full"
+              >
+                Login
+              </Button>
+            )}
             
             <a href="/admin">
               <Button size="icon" variant="ghost" className="text-muted-foreground">

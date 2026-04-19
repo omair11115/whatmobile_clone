@@ -167,6 +167,34 @@ const initDb = async () => {
           alt_text TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
+
+        -- Create users, comments, and ratings tables
+        CREATE TABLE IF NOT EXISTS users (
+            id TEXT PRIMARY KEY,
+            google_id TEXT UNIQUE,
+            email TEXT UNIQUE,
+            name TEXT,
+            avatar TEXT,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS comments (
+            id TEXT PRIMARY KEY,
+            mobile_id TEXT REFERENCES mobiles(id) ON DELETE CASCADE,
+            user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+            content TEXT NOT NULL,
+            parent_id TEXT REFERENCES comments(id) ON DELETE CASCADE,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS ratings (
+            id TEXT PRIMARY KEY,
+            mobile_id TEXT REFERENCES mobiles(id) ON DELETE CASCADE,
+            user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+            rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(mobile_id, user_id)
+        );
       `);
       console.log("PostgreSQL tables initialized");
     } finally {
