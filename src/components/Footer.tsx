@@ -19,7 +19,7 @@ export function Footer() {
   return (
     <footer className="bg-muted/50 border-t pt-12 pb-8">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12">
           {/* Brand Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -30,7 +30,7 @@ export function Footer() {
                 MobiSpec<span className="text-muted-foreground text-xs lowercase">.com</span>
               </span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
               Your ultimate destination for the latest mobile phone specifications, prices, and news. Stay updated with the fast-moving mobile world.
             </p>
             <div className="flex items-center gap-4">
@@ -67,24 +67,6 @@ export function Footer() {
               )}
               <li><a href="/search?q=" className="text-[#1a3a5a] font-bold hover:underline transition-colors mt-1 block">All Brands</a></li>
             </ul>
-          </div>
-
-          {/* Newsletter / Contact Prompt */}
-          <div className="space-y-4">
-            <h3 className="font-bold text-sm uppercase text-[#1a3a5a] mb-5 tracking-wider">Newsletter</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Subscribe to get the latest mobile launches and price updates directly in your inbox.
-            </p>
-            <div className="flex gap-2">
-              <input 
-                type="email" 
-                placeholder="Your email" 
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#1a3a5a]"
-              />
-              <button className="bg-[#1a3a5a] text-white rounded-md px-4 py-1 text-xs font-bold hover:bg-[#2c4c6c] transition-colors uppercase">
-                Join
-              </button>
-            </div>
           </div>
         </div>
 
