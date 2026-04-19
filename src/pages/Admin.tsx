@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Zap, RefreshCw, CheckCircle2, AlertCircle, Plus, Edit2, Trash2, LogOut, Smartphone, FileText, Settings, Image as ImageIcon, Copy, Check } from 'lucide-react';
+import { Zap, RefreshCw, CheckCircle2, AlertCircle, Plus, Edit2, Trash2, LogOut, Smartphone, FileText, Settings, Image as ImageIcon, Copy, Check, Search } from 'lucide-react';
 import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption, GalleryImage } from '@/src/types';
 
 export function Admin() {
@@ -43,6 +43,7 @@ export function Admin() {
   const [imageForm, setImageForm] = useState({ description: '', altText: '' });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
+  const [gallerySearch, setGallerySearch] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -1093,8 +1094,17 @@ export function Admin() {
 
           {/* Gallery Management */}
           <TabsContent value="gallery" className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <h2 className="text-xl font-bold text-[#1a3a5a]">Image Gallery</h2>
+              <div className="relative w-full md:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Search image name..." 
+                  className="pl-9 h-9" 
+                  value={gallerySearch}
+                  onChange={e => setGallerySearch(e.target.value)}
+                />
+              </div>
             </div>
 
             <Card className="border-primary/20">
@@ -1140,31 +1150,51 @@ export function Admin() {
             </Card>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {galleryImages.map(img => (
-                <Card key={img.id} className="overflow-hidden group">
-                  <div className="aspect-square bg-muted/30 relative">
-                    <img 
-                      src={img.url} 
-                      alt={img.altText} 
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                      <Button size="icon" variant="secondary" onClick={() => copyToClipboard(img.url)} title="Copy Link">
-                        {copyStatus === img.url ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                      </Button>
-                      <Button size="icon" variant="destructive" onClick={() => handleDeleteImage(img.id)} title="Delete Image">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+              {galleryImages
+                .filter(img => 
+                  img.fileName.toLowerCase().includes(gallerySearch.toLowerCase()) ||
+                  (img.description && img.description.toLowerCase().includes(gallerySearch.toLowerCase())) ||
+                  (img.altText && img.altText.toLowerCase().includes(gallerySearch.toLowerCase()))
+                )
+                .map(img => (
+                  <Card key={img.id} className="overflow-hidden group">
+                    <div className="aspect-square bg-muted/30 relative">
+                      <img 
+                        src={img.url} 
+                        alt={img.altText} 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <Button size="icon" variant="secondary" onClick={() => copyToClipboard(img.url)} title="Copy Link">
+                          {copyStatus === img.url ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                        </Button>
+                        <Button size="icon" variant="destructive" onClick={() => handleDeleteImage(img.id)} title="Delete Image">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-2 text-[10px] space-y-1">
-                    <p className="font-bold truncate" title={img.fileName}>{img.fileName}</p>
-                    <p className="text-muted-foreground truncate">{img.description || 'No description'}</p>
-                  </div>
-                </Card>
-              ))}
+                    <div className="p-2 text-[10px] space-y-1">
+                      <p className="font-bold truncate" title={img.fileName}>{img.fileName}</p>
+                      <p className="text-muted-foreground truncate">{img.description || 'No description'}</p>
+                    </div>
+                  </Card>
+                ))}
             </div>
+
+            {galleryImages.length > 0 && 
+             galleryImages.filter(img => 
+                img.fileName.toLowerCase().includes(gallerySearch.toLowerCase()) ||
+                (img.description && img.description.toLowerCase().includes(gallerySearch.toLowerCase())) ||
+                (img.altText && img.altText.toLowerCase().includes(gallerySearch.toLowerCase()))
+             ).length === 0 && (
+              <div className="text-center py-12 bg-white border rounded-lg">
+                <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
+                <p className="text-muted-foreground">No images match your search "{gallerySearch}".</p>
+                <Button variant="link" onClick={() => setGallerySearch('')} className="mt-2">Clear search</Button>
+              </div>
+            )}
+
             {galleryImages.length === 0 && (
               <div className="text-center py-12 bg-white border rounded-lg">
                 <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
