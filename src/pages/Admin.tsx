@@ -46,6 +46,51 @@ export function Admin() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const [gallerySearch, setGallerySearch] = useState('');
+  const [optimizationType, setOptimizationType] = useState<'none' | 'portrait' | 'landscape'>('none');
+
+  const resizeImage = (file: File, width: number, height: number): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return reject('Failed to get canvas context');
+
+          const targetRatio = width / height;
+          const imgRatio = img.width / img.height;
+          let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
+
+          if (imgRatio > targetRatio) {
+            drawHeight = img.height;
+            drawWidth = img.height * targetRatio;
+            offsetX = (img.width - drawWidth) / 2;
+          } else {
+            drawWidth = img.width;
+            drawHeight = img.width / targetRatio;
+            offsetY = (img.height - drawHeight) / 2;
+          }
+
+          ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const resizedFile = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
+              resolve(resizedFile);
+            } else {
+              reject('Failed to create blob');
+            }
+          }, 'image/jpeg', 0.9);
+        };
+        img.onerror = () => reject('Failed to load image');
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject('Failed to read file');
+      reader.readAsDataURL(file);
+    });
+  };
 
   const quillModules = {
     toolbar: [
@@ -147,8 +192,24 @@ export function Admin() {
     if (!selectedFile) return;
 
     setIsUploading(true);
+    let fileToUpload = selectedFile;
+    
+    if (optimizationType === 'portrait') {
+      try {
+        fileToUpload = await resizeImage(selectedFile, 900, 1200);
+      } catch (err) {
+        console.error("Resizing failed:", err);
+      }
+    } else if (optimizationType === 'landscape') {
+      try {
+        fileToUpload = await resizeImage(selectedFile, 1280, 720);
+      } catch (err) {
+        console.error("Resizing failed:", err);
+      }
+    }
+
     const formData = new FormData();
-    formData.append('image', selectedFile);
+    formData.append('image', fileToUpload);
     formData.append('description', imageForm.description);
     formData.append('altText', imageForm.altText);
 
@@ -1154,6 +1215,18 @@ export function Admin() {
                         onChange={e => setSelectedFile(e.target.files?.[0] || null)} 
                         required 
                       />
+                    </div>
+                    <div className="space-y-2">
+                       <Label>Auto-Optimization (Aspect Ratio)</Label>
+                       <select 
+                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                         value={optimizationType}
+                         onChange={(e) => setOptimizationType(e.target.value as any)}
+                       >
+                         <option value="none">Original (No Cropping)</option>
+                         <option value="portrait">3:4 Portrait (Ideal for Phones - 900x1200)</option>
+                         <option value="landscape">16:9 Landscape (Ideal for News - 1280x720)</option>
+                       </select>
                     </div>
                     <div className="space-y-2">
                       <Label>Alt Text</Label>

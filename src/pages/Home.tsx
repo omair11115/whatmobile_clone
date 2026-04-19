@@ -253,7 +253,7 @@ export function Home() {
                 {comingSoonPhones.length > 0 ? comingSoonPhones.map(phone => (
                   <div key={phone.id} className="flex flex-col items-center text-center">
                     <div className="aspect-[3/4] w-24 relative mb-2">
-                      <img src={phone.images?.[0]} alt={phone.name} className="object-contain w-full h-full" referrerPolicy="no-referrer" />
+                      <img src={phone.images?.[0]} alt={phone.name} className="object-cover w-full h-full rounded-md" referrerPolicy="no-referrer" />
                     </div>
                     <h3 className="text-[10px] font-bold leading-tight mb-1">{phone.name}</h3>
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Expected Price</p>

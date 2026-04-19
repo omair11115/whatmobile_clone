@@ -13,7 +13,7 @@ export function PhoneCard({ phone }: PhoneCardProps) {
           <img 
             src={phone.images[0] || 'https://picsum.photos/seed/phone/200/300'} 
             alt={phone.name}
-            className="object-contain w-full h-full"
+            className="object-cover w-full h-full"
             referrerPolicy="no-referrer"
           />
         </div>
