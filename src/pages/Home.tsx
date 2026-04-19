@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PhoneCard } from '@/src/components/PhoneCard';
 import { BlogCard } from '@/src/components/BlogCard';
 import { BrandGrid } from '@/src/components/BrandGrid';
@@ -13,6 +14,7 @@ import { BRANDS } from '@/src/constants';
 // Removed Mock Data Constants
 
 export function Home() {
+  const navigate = useNavigate();
   const [phones, setPhones] = useState<Mobile[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [priceRanges, setPriceRanges] = useState<PriceRange[]>([]);
@@ -106,11 +108,9 @@ export function Home() {
             <span className="text-2xl font-black tracking-tighter uppercase">MobiSpec<span className="text-primary-foreground/60 text-sm lowercase">.com</span></span>
           </div>
           <div className="hidden md:flex gap-4">
-            <Button variant="secondary" size="sm" className="bg-[#2c4c6c] text-white border-none hover:bg-[#3c5c7c]">Mobile Phones</Button>
-            <Button variant="secondary" size="sm" className="bg-[#2c4c6c] text-white border-none hover:bg-[#3c5c7c]">Reviews</Button>
-            <Button variant="secondary" size="sm" className="bg-[#2c4c6c] text-white border-none hover:bg-[#3c5c7c]">News</Button>
-            <Button variant="secondary" size="sm" className="bg-[#2c4c6c] text-white border-none hover:bg-[#3c5c7c]">Contact us</Button>
-            <Button variant="secondary" size="sm" className="bg-[#2c4c6c] text-white border-none hover:bg-[#3c5c7c]">Outlets</Button>
+            <Button variant="secondary" size="sm" className="bg-[#2c4c6c] text-white border-none hover:bg-[#3c5c7c]" onClick={() => navigate('/')}>Mobile Phones</Button>
+            <Button variant="secondary" size="sm" className="bg-[#2c4c6c] text-white border-none hover:bg-[#3c5c7c]" onClick={() => navigate('/news')}>News</Button>
+            <Button variant="secondary" size="sm" className="bg-[#2c4c6c] text-white border-none hover:bg-[#3c5c7c]" onClick={() => navigate('/contact')}>Contact us</Button>
           </div>
         </div>
       </div>

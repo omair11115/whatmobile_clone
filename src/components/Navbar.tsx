@@ -46,9 +46,7 @@ export function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
             <a href="/" className="px-4 py-2 text-sm font-bold text-[#1a3a5a] hover:bg-muted rounded-md transition-colors">Home</a>
-            <a href="/brands" className="px-4 py-2 text-sm font-bold text-[#1a3a5a] hover:bg-muted rounded-md transition-colors">Brands</a>
             <a href="/news" className="px-4 py-2 text-sm font-bold text-[#1a3a5a] hover:bg-muted rounded-md transition-colors">News</a>
-            <a href="/compare" className="px-4 py-2 text-sm font-bold text-[#1a3a5a] hover:bg-muted rounded-md transition-colors">Compare</a>
           </div>
 
           {/* Actions */}

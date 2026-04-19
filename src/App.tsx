@@ -8,6 +8,7 @@ import { Admin } from '@/src/pages/Admin';
 import { Search } from '@/src/pages/Search';
 import { CategoryPage } from '@/src/pages/CategoryPage';
 import { BlogDetail } from '@/src/pages/BlogDetail';
+import Contact from '@/src/pages/Contact';
 import { AuthProvider } from '@/src/lib/auth';
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
               <Route path="/search" element={<Search />} />
               <Route path="/:type/:slug" element={<CategoryPage />} />
               <Route path="/price-range" element={<CategoryPage />} />
+              <Route path="/contact" element={<Contact />} />
               <Route path="*" element={<Home />} />
             </Routes>
           </main>
