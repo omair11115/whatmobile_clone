@@ -60,7 +60,7 @@ export default function Contact() {
                 <item.icon className="h-7 w-7 text-[#1a3a5a] group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-xs uppercase font-black tracking-widest text-muted-foreground mb-3">{item.label}</h3>
-              <p className="text-lg font-bold text-[#1a3a5a]">{item.value}</p>
+              <p className="text-lg font-bold text-[#1a3a5a] break-words md:break-all lg:break-normal">{item.value}</p>
             </motion.a>
           ))}
         </div>
