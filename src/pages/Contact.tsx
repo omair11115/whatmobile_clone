@@ -54,13 +54,15 @@ export default function Contact() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.1, duration: 0.4 }}
-              className="bg-white p-8 rounded-2xl shadow-sm border border-black/5 hover:shadow-xl hover:-translate-y-1 transition-all group"
+              className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-black/5 hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden"
             >
               <div className="bg-[#1a3a5a]/5 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-[#1a3a5a] transition-colors">
                 <item.icon className="h-7 w-7 text-[#1a3a5a] group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-xs uppercase font-black tracking-widest text-muted-foreground mb-3">{item.label}</h3>
-              <p className="text-lg font-bold text-[#1a3a5a] break-words md:break-all lg:break-normal">{item.value}</p>
+              <p className="text-base sm:text-lg font-bold text-[#1a3a5a] break-all leading-tight">
+                {item.value}
+              </p>
             </motion.a>
           ))}
         </div>
