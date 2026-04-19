@@ -182,6 +182,7 @@ async function startServer() {
           <body>
             <script>
               if (window.opener) {
+                // Use '*' to ensure the message reaches the parent regardless of origin detection logic in dev
                 window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS' }, '*');
                 window.close();
               } else {

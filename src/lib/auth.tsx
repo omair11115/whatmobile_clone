@@ -21,8 +21,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener('TRIGGER_LOGIN', handleLoginTrigger);
     
     const handleMessage = (event: MessageEvent) => {
+      // Allow messages from the same domain (including ngrok)
+      // and common dev/preview domains
       const origin = event.origin;
-      if (!origin.endsWith('.run.app') && !origin.includes('localhost')) return;
+      const isAllowed = 
+        origin === window.location.origin ||
+        origin.endsWith('.run.app') || 
+        origin.includes('localhost') ||
+        origin.includes('ngrok-free.dev');
+        
+      if (!isAllowed) return;
       
       if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
         checkAuth();
