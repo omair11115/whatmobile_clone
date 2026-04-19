@@ -81,8 +81,15 @@ async function startServer() {
   };
 
   // Google OAuth Routes
+  const getRedirectUri = (req: any) => {
+    let baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+    // Remove trailing slash if present
+    baseUrl = baseUrl.replace(/\/+$/, '');
+    return `${baseUrl}/auth/google/callback`;
+  };
+
   app.get('/api/auth/google/url', (req, res) => {
-    const redirectUri = `${process.env.APP_URL || 'http://localhost:3000'}/auth/google/callback`;
+    const redirectUri = getRedirectUri(req);
     const url = `https://accounts.google.com/o/oauth2/v2/auth?` +
       `client_id=${process.env.GOOGLE_CLIENT_ID}&` +
       `redirect_uri=${encodeURIComponent(redirectUri)}&` +
@@ -96,7 +103,7 @@ async function startServer() {
     if (!code) return res.status(400).send("No code provided");
 
     try {
-      const redirectUri = `${process.env.APP_URL || 'http://localhost:3000'}/auth/google/callback`;
+      const redirectUri = getRedirectUri(req);
       const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
