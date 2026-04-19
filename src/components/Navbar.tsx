@@ -35,18 +35,18 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 group">
-            <div className="p-1.5 bg-[#1a3a5a] rounded-lg text-white group-hover:bg-[#2c4c6c] transition-colors">
+            <div className="p-1.5 bg-linear-to-br from-primary via-indigo-500 to-secondary rounded-lg text-white group-hover:scale-105 transition-all shadow-md shadow-primary/20">
               <Smartphone className="h-6 w-6" />
             </div>
-            <span className="text-xl font-black tracking-tighter uppercase text-[#1a3a5a]">
-              MobiSpec<span className="text-muted-foreground text-xs lowercase">.com</span>
+            <span className="text-xl font-black tracking-tighter uppercase text-slate-800 flex items-center">
+              Mobi<span className="text-primary">Spec</span><span className="text-muted-foreground text-[10px] lowercase ml-0.5 opacity-70">.com</span>
             </span>
           </a>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
-            <a href="/" className="px-4 py-2 text-sm font-bold text-[#1a3a5a] hover:bg-muted rounded-md transition-colors">Home</a>
-            <a href="/news" className="px-4 py-2 text-sm font-bold text-[#1a3a5a] hover:bg-muted rounded-md transition-colors">News</a>
+            <a href="/" className="px-4 py-2 text-sm font-bold text-slate-700 hover:text-primary hover:bg-primary/5 rounded-md transition-all">Home</a>
+            <a href="/news" className="px-4 py-2 text-sm font-bold text-slate-700 hover:text-secondary hover:bg-secondary/5 rounded-md transition-all">News</a>
           </div>
 
           {/* Actions */}
@@ -55,7 +55,7 @@ export function Navbar() {
               <form onSubmit={handleSearch}>
                 <Input 
                   placeholder="Search Mobile..." 
-                  className="w-48 lg:w-64 h-9 text-xs rounded-full bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-[#1a3a5a]"
+                  className="w-48 lg:w-64 h-9 text-xs rounded-full bg-slate-100 border-transparent focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/20 transition-all font-medium"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />

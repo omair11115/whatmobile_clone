@@ -94,56 +94,63 @@ export function Home() {
   const comingSoonPhones = displayPhones.filter(p => p.comingSoon); 
 
   return (
-    <div className="min-h-screen bg-[#f0f2f5] pb-12">
+    <div className="min-h-screen bg-background pb-12">
       <SEO 
         title="Latest Mobile Phone Specs & Prices in Pakistan" 
         description="Find detailed specifications, prices, and reviews of the latest mobile phones from Samsung, Apple, Xiaomi, Vivo, and more."
       />
 
-      {/* Header Banner */}
-      <div className="bg-[#1a3a5a] py-4 border-b border-[#0d2640]">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center gap-2 text-white">
-            <Smartphone className="h-8 w-8" />
-            <span className="text-2xl font-black tracking-tighter uppercase">MobiSpec<span className="text-primary-foreground/60 text-sm lowercase">.com</span></span>
-          </div>
-          <div className="hidden md:flex gap-4">
-            <Button variant="secondary" size="sm" className="bg-[#2c4c6c] text-white border-none hover:bg-[#3c5c7c]" onClick={() => navigate('/')}>Mobile Phones</Button>
-            <Button variant="secondary" size="sm" className="bg-[#2c4c6c] text-white border-none hover:bg-[#3c5c7c]" onClick={() => navigate('/news')}>News</Button>
-            <Button variant="secondary" size="sm" className="bg-[#2c4c6c] text-white border-none hover:bg-[#3c5c7c]" onClick={() => navigate('/contact')}>Contact us</Button>
+      {/* Hero Slider Placeholder */}
+      <div className="bg-linear-to-br from-primary via-indigo-600 to-secondary py-16 text-white border-b shadow-lg relative overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-1/2 -right-24 w-64 h-64 bg-secondary/20 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-3xl">
+            <Badge className="mb-4 bg-white/20 hover:bg-white/30 text-white border-none backdrop-blur-md px-3 py-1">
+              <Zap className="h-3 w-3 mr-1 fill-current" /> Daily Price Updates
+            </Badge>
+            <h1 className="text-4xl md:text-6xl font-black uppercase mb-4 leading-[0.95] tracking-tighter">
+              Discover the <span className="text-accent underline decoration-4 underline-offset-4">Perfect</span> Smartphone
+            </h1>
+            <p className="text-lg md:text-xl opacity-90 font-medium mb-8 max-w-xl">
+              Compare detailed specs, real-time prices, and stay ahead with the latest mobile news in Pakistan.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Button size="lg" className="bg-white text-primary hover:bg-slate-100 font-bold px-8 rounded-xl shadow-xl transition-all hover:-translate-y-1">
+                Explore Mobile Phones
+              </Button>
+              <Button size="lg" variant="outline" className="bg-transparent text-white border-white/30 hover:bg-white/10 font-bold px-8 rounded-xl backdrop-blur-sm transition-all hover:border-white">
+                Today's News
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-9 space-y-8">
+          <div className="lg:col-span-9 space-y-10">
             
-            {/* Hero Slider Placeholder */}
-            <div className="aspect-[21/9] bg-gradient-to-r from-[#1a3a5a] to-[#2c4c6c] rounded-lg overflow-hidden relative flex items-center justify-center text-white p-8">
-              <div className="text-center">
-                <h2 className="text-3xl md:text-5xl font-black uppercase mb-2">Daily Price Update</h2>
-                <p className="text-xl opacity-80">Check the latest smartphone prices in real-time</p>
-              </div>
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                <div className="w-2 h-2 rounded-full bg-white"></div>
-                <div className="w-2 h-2 rounded-full bg-white/30"></div>
-                <div className="w-2 h-2 rounded-full bg-white/30"></div>
-              </div>
-            </div>
-
             {/* Latest Mobile Phones Section */}
-            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
-              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
-                <h2 className="text-sm font-bold text-[#d32f2f] uppercase tracking-tight">Latest Mobile Phones & Prices</h2>
+            <section className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="bg-slate-50/50 border-b px-5 py-3 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-6 bg-primary rounded-full"></div>
+                  <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight">Latest Mobile Phones & Prices</h2>
+                </div>
+                <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">Updated Today</Badge>
               </div>
-              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+              <div className="p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                 {displayPhones.slice(0, 6).map(phone => (
                   <PhoneCard key={phone.id} phone={phone} />
                 ))}
                 {displayPhones.length === 0 && (
-                  <div className="col-span-full py-8 text-center text-muted-foreground text-xs italic">
+                  <div className="col-span-full py-12 text-center text-muted-foreground text-sm italic">
                     No latest mobile phones found.
                   </div>
                 )}
@@ -151,90 +158,65 @@ export function Home() {
             </section>
 
             {/* Price Row 1: > 50,000 */}
-            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
-              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
-                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile phones Price in Pakistan {'>'} 50,000 Rs.</h2>
-                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+            <section className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden group hover:border-indigo-200 transition-all">
+              <div className="bg-indigo-50/30 border-b border-indigo-50 px-5 py-3 flex justify-between items-center group-hover:bg-indigo-50 transition-all">
+                <h2 className="text-sm font-black text-indigo-900 uppercase tracking-tight flex items-center gap-2">
+                  <Star className="h-4 w-4 text-indigo-500 fill-indigo-500" />
+                  Premium Phones {'>'} 50,000 PKR
+                </h2>
+                <a href="#" className="text-[10px] font-black text-indigo-600 hover:text-indigo-800 uppercase tracking-widest flex items-center gap-1 group/link">
+                  View All <ChevronRight className="h-3 w-3 group-hover/link:translate-x-0.5 transition-all" />
+                </a>
               </div>
-              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+              <div className="p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                 {pkr50kPlus.slice(0, 6).map(phone => (
                   <PhoneCard key={phone.id} phone={phone} />
                 ))}
               </div>
             </section>
 
-            {/* Price Row 2: 40k - 50k */}
-            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
-              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
-                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices Between 40,000 and 50,000 Rs.</h2>
-                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+            {/* Price Row 2: 40k - 50k - Rose theme */}
+            <section className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden group hover:border-rose-200 transition-all">
+              <div className="bg-rose-50/30 border-b border-rose-50 px-5 py-3 flex justify-between items-center group-hover:bg-rose-50 transition-all">
+                <h2 className="text-sm font-black text-rose-900 uppercase tracking-tight flex items-center gap-2">
+                  <Smartphone className="h-4 w-4 text-rose-500" />
+                  Mid-Range (40k - 50k PKR)
+                </h2>
+                <a href="#" className="text-[10px] font-black text-rose-600 hover:text-rose-800 uppercase tracking-widest flex items-center gap-1 group/link">
+                  View All <ChevronRight className="h-3 w-3 group-hover/link:translate-x-0.5 transition-all" />
+                </a>
               </div>
-              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+              <div className="p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                 {pkr40kTo50k.slice(0, 6).map(phone => (
                   <PhoneCard key={phone.id} phone={phone} />
                 ))}
               </div>
             </section>
 
-            {/* Price Row 3: 30k - 40k */}
-            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
-              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
-                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices 30,000 - 40,000 Rs.</h2>
-                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
-              </div>
-              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
-                {pkr30kTo40k.slice(0, 6).map(phone => (
-                  <PhoneCard key={phone.id} phone={phone} />
-                ))}
-              </div>
-            </section>
-
-            {/* Price Row 4: 20k - 30k */}
-            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
-              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
-                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices 20,001 - 30,000 Rs.</h2>
-                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
-              </div>
-              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
-                {pkr20kTo30k.slice(0, 6).map(phone => (
-                  <PhoneCard key={phone.id} phone={phone} />
-                ))}
-              </div>
-            </section>
-
-            {/* Price Row 5: Under 10k */}
-            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
-              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
-                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices under 10,000 in Pakistan</h2>
-                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
-              </div>
-              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
-                {pkrUnder10k.slice(0, 6).map(phone => (
-                  <PhoneCard key={phone.id} phone={phone} />
-                ))}
-              </div>
-            </section>
-
-            {/* Price Table Section */}
-            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
-              <div className="bg-[#f8f9fa] border-b px-4 py-2 text-center">
-                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Phones Price in Pakistan</h2>
+            {/* Price Table Section - Emerald Theme */}
+            <section className="bg-white rounded-2xl border border-emerald-100 shadow-xl shadow-emerald-500/5 overflow-hidden">
+              <div className="bg-emerald-600 px-5 py-4 text-center">
+                <h2 className="text-md font-black text-white uppercase tracking-widest">Today's Market Prices in Pakistan</h2>
+                <p className="text-xs text-white/70 font-medium">Daily updated smartphone price index</p>
               </div>
               <div className="p-0 overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-[#f8f9fa] border-b">
-                      <th className="px-4 py-2 text-xs font-bold text-[#1a3a5a] uppercase">Latest Mobile Phones Models</th>
-                      <th className="px-4 py-2 text-xs font-bold text-[#1a3a5a] uppercase text-right">Price</th>
+                    <tr className="bg-emerald-50 border-b border-emerald-100">
+                      <th className="px-6 py-4 text-[10px] font-black text-emerald-800 uppercase tracking-widest">Mobile Model</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-emerald-800 uppercase tracking-widest text-right">Market Price</th>
                     </tr>
                   </thead>
                   <tbody>
                     {displayPhones.slice(0, 10).map(phone => (
-                      <tr key={phone.id} className="border-b hover:bg-muted/30 transition-colors">
-                        <td className="px-4 py-2 text-xs">
-                          <a href={`/phone/${phone.slug}`} className="text-[#1a3a5a] hover:text-primary">{phone.name}</a>
+                      <tr key={phone.id} className="border-b border-slate-50 hover:bg-emerald-50/50 transition-colors group">
+                        <td className="px-6 py-4 text-sm font-semibold text-slate-700">
+                          <a href={`/phone/${phone.slug}`} className="hover:text-emerald-600 transition-colors flex items-center gap-2">
+                            <span>{phone.name}</span>
+                            <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-all text-emerald-400" />
+                          </a>
                         </td>
-                        <td className="px-4 py-2 text-xs text-right font-bold text-[#d32f2f]">
+                        <td className="px-6 py-4 text-sm text-right font-black text-emerald-600">
                           {phone.currency} {phone.price.toLocaleString()}
                         </td>
                       </tr>
@@ -244,171 +226,69 @@ export function Home() {
               </div>
             </section>
 
-            {/* Coming Soon Section */}
-            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
-              <div className="bg-[#f8f9fa] border-b px-4 py-2">
-                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Coming Soon Mobiles Prices in Pakistan</h2>
+            {/* Coming Soon Section - Amber Theme */}
+            <section className="bg-white rounded-2xl border border-amber-100 shadow-sm overflow-hidden">
+              <div className="bg-amber-50/50 border-b border-amber-100 px-5 py-3 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
+                  <Clock className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-black text-amber-900 uppercase tracking-tight leading-none mb-1">Coming Soon</h2>
+                  <p className="text-[10px] text-amber-600/70 font-bold uppercase tracking-wider">Anticipated Releases</p>
+                </div>
               </div>
-              <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="p-6 grid grid-cols-2 sm:grid-cols-4 gap-6">
                 {comingSoonPhones.length > 0 ? comingSoonPhones.map(phone => (
-                  <div key={phone.id} className="flex flex-col items-center text-center">
-                    <div className="aspect-[3/4] w-24 relative mb-2">
-                      <img src={phone.images?.[0]} alt={phone.name} className="object-cover w-full h-full rounded-md" referrerPolicy="no-referrer" />
+                  <div key={phone.id} className="flex flex-col items-center text-center group">
+                    <div className="aspect-[3/4] w-28 relative mb-3 bg-slate-50 rounded-2xl p-2 group-hover:scale-105 transition-all shadow-sm">
+                      <img src={phone.images?.[0]} alt={phone.name} className="object-cover w-full h-full rounded-xl" referrerPolicy="no-referrer" />
                     </div>
-                    <h3 className="text-[10px] font-bold leading-tight mb-1">{phone.name}</h3>
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Expected Price</p>
-                    <p className="text-[10px] font-bold text-[#d32f2f]">
+                    <h3 className="text-xs font-black text-slate-800 leading-tight mb-1 group-hover:text-amber-600 transition-colors uppercase">{phone.name}</h3>
+                    <div className="bg-amber-100/50 px-2 py-0.5 rounded text-[9px] text-amber-700 font-black uppercase mb-1">Expected Price</div>
+                    <p className="text-sm font-black text-slate-900">
                       {phone.currency} {phone.price}
                     </p>
                   </div>
                 )) : (
-                  <div className="col-span-full py-8 text-center text-muted-foreground text-xs italic">
+                  <div className="col-span-full py-12 text-center text-muted-foreground text-sm italic">
                     No coming soon mobiles announced yet.
                   </div>
                 )}
               </div>
             </section>
 
-            {/* Latest News Section */}
-            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
-              <div className="bg-[#f8f9fa] border-b px-4 py-2">
-                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Latest News</h2>
+            {/* Latest News Section - Violet Theme */}
+            <section className="bg-white rounded-2xl border border-violet-100 shadow-sm overflow-hidden">
+              <div className="bg-violet-50/50 border-b border-violet-100 px-5 py-4 flex justify-between items-center">
+                <h2 className="text-sm font-black text-violet-900 uppercase tracking-tight flex items-center gap-2">
+                  <Newspaper className="h-4 w-4 text-violet-500" />
+                  Tech Community & News
+                </h2>
+                <Button variant="ghost" size="sm" className="text-[10px] font-black text-violet-600 hover:text-violet-700 hover:bg-violet-100 uppercase tracking-widest" onClick={() => navigate('/news')}>
+                  All News
+                </Button>
               </div>
-              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {posts.map(post => (
-                  <a key={post.id} href={`/blog/${post.slug}`} className="group block border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                    <div className="aspect-video relative overflow-hidden">
-                      <img src={post.image} alt={post.title} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
+                  <a key={post.id} href={`/blog/${post.slug}`} className="group block border border-slate-50 rounded-2xl overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1">
+                    <div className="aspect-[16/9] relative overflow-hidden">
+                      <img src={post.image} alt={post.title} className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                     </div>
-                    <div className="p-3">
-                      <h3 className="text-xs font-bold line-clamp-2 leading-tight group-hover:text-primary transition-colors">{post.title}</h3>
+                    <div className="p-4 bg-white">
+                      <div className="h-1 w-12 bg-violet-600 rounded-full mb-3 group-hover:w-20 transition-all duration-500"></div>
+                      <h3 className="text-sm font-black text-slate-800 line-clamp-2 leading-tight group-hover:text-violet-600 transition-colors uppercase antialiased tracking-tight">{post.title}</h3>
                     </div>
                   </a>
                 ))}
-                {posts.length === 0 && (
-                  <div className="col-span-full py-8 text-center text-muted-foreground text-xs italic">
-                    No latest news available.
-                  </div>
-                )}
               </div>
             </section>
 
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Search by Brand Sidebar */}
-            <section className="bg-white border rounded-lg shadow-sm overflow-hidden">
-              <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
-                Search by Brand
-              </div>
-              <div className="p-2 grid grid-cols-1 gap-0.5">
-                {brands.length > 0 ? brands.map(brand => (
-                  <a key={brand.id} href={`/brand/${brand.slug}`} className="px-3 py-1.5 text-[11px] font-medium hover:bg-muted transition-colors border-b last:border-0 border-muted/50 flex justify-between items-center group">
-                    <span>{brand.name} Mobile</span>
-                    <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </a>
-                )) : (
-                  <div className="px-3 py-4 text-center text-[10px] text-muted-foreground italic">No brands found.</div>
-                )}
-              </div>
-            </section>
-
-            {/* Search by Price Sidebar */}
-            <section className="bg-white border rounded-lg shadow-sm overflow-hidden">
-              <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
-                Search by Price
-              </div>
-              <div className="p-2 grid grid-cols-1 gap-0.5 text-[11px] font-medium">
-                {priceRanges.length > 0 ? priceRanges.map(range => (
-                  <a key={range.id} href={`/price-range?min=${range.minPrice}&max=${range.maxPrice}&label=${encodeURIComponent(range.label)}`} className="px-3 py-1.5 hover:bg-muted border-b border-muted/50 block">
-                    {range.label}
-                  </a>
-                )) : (
-                  <div className="px-3 py-4 text-center text-[10px] text-muted-foreground italic">No price ranges found.</div>
-                )}
-              </div>
-            </section>
-
-            {/* Search by Network Sidebar */}
-            {networks.length > 0 && (
-              <section className="bg-white border rounded-lg shadow-sm overflow-hidden mt-4">
-                <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
-                  Search by Network
-                </div>
-                <div className="p-2 grid grid-cols-1 gap-0.5 text-[11px] font-medium">
-                  {networks.map(n => (
-                    <a key={n.id} href={`/network/${n.slug}`} className="px-3 py-1.5 hover:bg-muted border-b border-muted/50 block">
-                      {n.name}
-                    </a>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Search by RAM Sidebar */}
-            {ramOptions.length > 0 && (
-              <section className="bg-white border rounded-lg shadow-sm overflow-hidden mt-4">
-                <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
-                  Search by RAM
-                </div>
-                <div className="p-2 grid grid-cols-1 gap-0.5 text-[11px] font-medium">
-                  {ramOptions.map(r => (
-                    <a key={r.id} href={`/ram/${r.slug}`} className="px-3 py-1.5 hover:bg-muted border-b border-muted/50 block">
-                      {r.label}
-                    </a>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Search by Screen Sidebar */}
-            {screenSizes.length > 0 && (
-              <section className="bg-white border rounded-lg shadow-sm overflow-hidden mt-4">
-                <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
-                  Search by Screen
-                </div>
-                <div className="p-2 grid grid-cols-1 gap-0.5 text-[11px] font-medium">
-                  {screenSizes.map(s => (
-                    <a key={s.id} href={`/screen/${s.slug}`} className="px-3 py-1.5 hover:bg-muted border-b border-muted/50 block">
-                      {s.label}
-                    </a>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Search by Feature Sidebar */}
-            {mobileFeatures.length > 0 && (
-              <section className="bg-white border rounded-lg shadow-sm overflow-hidden mt-4">
-                <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
-                  Search by Cam / Feature
-                </div>
-                <div className="p-2 grid grid-cols-1 gap-0.5 text-[11px] font-medium">
-                  {mobileFeatures.map(f => (
-                    <a key={f.id} href={`/feature/${f.slug}`} className="px-3 py-1.5 hover:bg-muted border-b border-muted/50 block">
-                      {f.label}
-                    </a>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Search by OS Sidebar */}
-            {osOptions.length > 0 && (
-              <section className="bg-white border rounded-lg shadow-sm overflow-hidden mt-4">
-                <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
-                  Search by OS
-                </div>
-                <div className="p-2 grid grid-cols-1 gap-0.5 text-[11px] font-medium">
-                  {osOptions.map(o => (
-                    <a key={o.id} href={`/os/${o.slug}`} className="px-3 py-1.5 hover:bg-muted border-b border-muted/50 block">
-                      {o.name}
-                    </a>
-                  ))}
-                </div>
-              </section>
-            )}
+          <div className="lg:col-span-3 space-y-8">
+            <Sidebar />
           </div>
         </div>
       </div>
