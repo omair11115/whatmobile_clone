@@ -6,14 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Smartphone, FileText, Settings, Image as ImageIcon, Copy, Check, Search, Type, CheckCircle, Zap, RefreshCw, Plus, Edit2, Trash2 } from 'lucide-react';
+import { Smartphone, FileText, Settings, Image as ImageIcon, Copy, Check, Search, Type, CheckCircle, Zap, RefreshCw, Plus, Edit2, Trash2, LogOut } from 'lucide-react';
 import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption, GalleryImage, UserRole, ContentStatus } from '@/src/types';
 import { useAuth } from '@/src/lib/auth';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 
 export function Admin() {
-  const { user, login, loginWithCredentials } = useAuth();
+  const { user, login, logout, loginWithCredentials } = useAuth();
   
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -580,6 +580,18 @@ export function Admin() {
           </div>
           <Button variant="ghost" size="sm" onClick={() => (window.location.href = '/')} className="text-muted-foreground hover:text-primary">
             Main Site
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={async () => {
+              await logout();
+              window.location.href = '/';
+            }} 
+            className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
           </Button>
         </div>
       </div>
