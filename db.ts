@@ -337,6 +337,132 @@ const initDb = async () => {
       }
 
       console.log("Database successfully initialized.");
+      
+      // Auto-Seed if mobiles are empty
+      const mobileCountRes = await client.query('SELECT count(*) FROM mobiles');
+      const mobileCount = parseInt(mobileCountRes.rows[0].count);
+      
+      if (mobileCount < 90) {
+        console.log("Database needs seeding. Cleaning and starting auto-seed...");
+        
+        await client.query('DELETE FROM mobiles');
+        await client.query('DELETE FROM posts');
+        await client.query('DELETE FROM brands');
+        await client.query('DELETE FROM price_ranges');
+        await client.query('DELETE FROM networks');
+        await client.query('DELETE FROM ram_options');
+        await client.query('DELETE FROM screen_sizes');
+        await client.query('DELETE FROM mobile_features');
+        await client.query('DELETE FROM os_options');
+        const seededBrands = [
+          { name: 'iPhone', slug: 'iphone', logo: 'https://picsum.photos/seed/apple/200/200' },
+          { name: 'Samsung', slug: 'samsung', logo: 'https://picsum.photos/seed/samsung/200/200' },
+          { name: 'Xiaomi', slug: 'xiaomi', logo: 'https://picsum.photos/seed/xiaomi/200/200' },
+          { name: 'Test Brand', slug: 'test-brand', logo: 'https://picsum.photos/seed/test/200/200' },
+        ];
+
+        for (const b of seededBrands) {
+          await client.query(
+            'INSERT INTO brands (id, name, slug, logo, description, status) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (name) DO NOTHING',
+            [uuidv4(), b.name, b.slug, b.logo, `${b.name} description.`, 'published']
+          );
+        }
+
+        // Seeding Filter Options
+        const priceRanges = [
+          { label: '10k - 20k', min: 10000, max: 20000 },
+          { label: '20k - 40k', min: 20001, max: 40000 },
+          { label: '40k - 70k', min: 40001, max: 70000 },
+          { label: '70k+', min: 70001, max: 500000 },
+        ];
+        for (const p of priceRanges) {
+          await client.query('INSERT INTO price_ranges (id, label, min_price, max_price) VALUES ($1, $2, $3, $4)', [uuidv4(), p.label, p.min, p.max]);
+        }
+
+        const networks = ['2G Band', '3G Band', '4G Band', '5G Band'];
+        for (const n of networks) {
+          await client.query('INSERT INTO networks (id, name, slug) VALUES ($1, $2, $3) ON CONFLICT (name) DO NOTHING', [uuidv4(), n, n.toLowerCase().replace(/ /g, '-')]);
+        }
+
+        const rams = ['2GB RAM', '4GB RAM', '6GB RAM', '8GB RAM', '12GB RAM', '16GB RAM'];
+        for (const r of rams) {
+          await client.query('INSERT INTO ram_options (id, label, slug) VALUES ($1, $2, $3) ON CONFLICT (label) DO NOTHING', [uuidv4(), r, r.toLowerCase().replace(/ /g, '-')]);
+        }
+
+        const screens = ['5.5 inches', '6 inches', '6.1 inches', '6.5 inches', '6.7 inches', '6.8 inches'];
+        for (const s of screens) {
+          await client.query('INSERT INTO screen_sizes (id, label, slug) VALUES ($1, $2, $3) ON CONFLICT (label) DO NOTHING', [uuidv4(), s, s.toLowerCase().replace(/ /g, '-')]);
+        }
+
+        const features = ['8MP', '12MP', '48MP', '50MP', '108MP', '200MP', 'Water Resistance', 'Fast Charging'];
+        for (const f of features) {
+          await client.query('INSERT INTO mobile_features (id, label, slug) VALUES ($1, $2, $3) ON CONFLICT (label) DO NOTHING', [uuidv4(), f, f.toLowerCase().replace(/ /g, '-')]);
+        }
+
+        const osList = ['Android', 'iOS', 'HarmonyOS'];
+        for (const o of osList) {
+          await client.query('INSERT INTO os_options (id, name, slug) VALUES ($1, $2, $3) ON CONFLICT (name) DO NOTHING', [uuidv4(), o, o.toLowerCase().replace(/ /g, '-')]);
+        }
+
+        // Seeding 100 Mobiles
+        const mobileModels = ['Pro', 'Ultra', 'S', 'Note', 'Edge', 'Plus', 'Max', 'Prime', 'Lite', 'Neo'];
+        for (let i = 1; i <= 100; i++) {
+            const brandObj = seededBrands[Math.floor(Math.random() * seededBrands.length)];
+            const model = mobileModels[Math.floor(Math.random() * mobileModels.length)];
+            const name = `${brandObj.name} ${model} ${Math.floor(Math.random() * 20) + 10}`;
+            const slug = `${name.toLowerCase().replace(/ /g, '-')}-${i}`;
+            const price = Math.floor(Math.random() * 150000) + 10000;
+            const ram = rams[Math.floor(Math.random() * rams.length)];
+            const screen = screens[Math.floor(Math.random() * screens.length)];
+            const network = networks[Math.floor(Math.random() * networks.length)];
+            const os = brandObj.name === 'iPhone' ? 'iOS' : (Math.random() > 0.1 ? 'Android' : 'HarmonyOS');
+            const feature = features[Math.floor(Math.random() * 6)];
+            
+            await client.query(
+                `INSERT INTO mobiles (
+                    id, name, brand, slug, price, currency, launch_date, 
+                    images, specs, description, category, features, 
+                    network, ram, screen_size, os, status
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
+                [
+                    uuidv4(),
+                    name,
+                    brandObj.name,
+                    slug,
+                    price.toString(),
+                    'Rs.',
+                    '2024, May',
+                    JSON.stringify(['https://picsum.photos/seed/' + slug + '/800/600']),
+                    JSON.stringify({ 
+                        build: { os, dimensions: '160 x 75 x 8 mm', weight: '190g' },
+                        display: { size: screen, technology: 'AMOLED' },
+                        memory: { ram: ram, internal: '128GB/256GB' },
+                        main_camera: { triple: feature + ' triple camera' }
+                    }),
+                    `The ${name} is a high-performance smartphone from ${brandObj.name}.`,
+                    price > 80000 ? 'flagship' : (price > 40000 ? 'mid-range' : 'budget'),
+                    JSON.stringify([feature]),
+                    network,
+                    ram,
+                    screen,
+                    os,
+                    'published'
+                ]
+            );
+        }
+
+        // Seeding News Posts
+        for (let i = 1; i <= 10; i++) {
+            const title = `Latest Tech Update ${i}: The Future of Mobile Technology`;
+            const slug = title.toLowerCase().replace(/ /g, '-').replace(/:/g, '') + '-' + i;
+            await client.query(
+                'INSERT INTO posts (id, title, slug, content, author, image, status) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+                [uuidv4(), title, slug, 'Today we look at the latest updates in the mobile industry. Many brands are launching new flagship devices with incredible camera features and faster processors.', 'Tech Reporter', 'https://picsum.photos/seed/tech' + i + '/1200/600', 'published']
+            );
+        }
+        console.log("✅ Auto-seed completed successfully.");
+      }
+
       console.log("PostgreSQL tables initialized");
     } finally {
       client.release();

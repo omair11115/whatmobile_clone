@@ -852,8 +852,19 @@ async function startServer() {
   });
 
   // API routes
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "ok", db: !!process.env.DATABASE_URL });
+  app.get("/api/health", async (req, res) => {
+    try {
+      const mobs = await pool.query('SELECT count(*) FROM mobiles');
+      const p = await pool.query('SELECT count(*) FROM posts');
+      res.json({ 
+        status: "ok", 
+        db_connected: true,
+        mobiles: mobs.rows[0].count,
+        posts: p.rows[0].count
+      });
+    } catch (err: any) {
+      res.json({ status: "error", error: err.message });
+    }
   });
 
   // AI Generation Endpoints
@@ -947,12 +958,12 @@ async function startServer() {
       }
 
       if (minPrice) {
-        conditions.push(`CAST(price AS INTEGER) >= $${params.length + 1}`);
+        conditions.push(`CAST(REPLACE(price, ',', '') AS INTEGER) >= $${params.length + 1}`);
         params.push(minPrice);
       }
 
       if (maxPrice) {
-        conditions.push(`CAST(price AS INTEGER) <= $${params.length + 1}`);
+        conditions.push(`CAST(REPLACE(price, ',', '') AS INTEGER) <= $${params.length + 1}`);
         params.push(maxPrice);
       }
 
