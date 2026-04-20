@@ -1,4 +1,4 @@
-import { Smartphone, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { Smartphone, Facebook, Twitter, Instagram, Youtube, ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Brand } from '@/src/types';
 
@@ -17,85 +17,66 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-16 pb-8 border-t border-slate-800">
+    <footer className="bg-muted/50 border-t pt-12 pb-8">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12">
           {/* Brand Info */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-linear-to-br from-primary to-secondary rounded-lg text-white">
+              <div className="p-1.5 bg-[#1a3a5a] rounded-lg text-white">
                 <Smartphone className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-black tracking-tighter uppercase text-white">
-                Mobi<span className="text-primary">Spec</span><span className="text-slate-500 text-xs lowercase ml-0.5 opacity-70">.com</span>
+              <span className="text-xl font-black tracking-tighter uppercase text-[#1a3a5a]">
+                MobiSpec<span className="text-muted-foreground text-xs lowercase">.com</span>
               </span>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed max-w-sm font-medium">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
               Your ultimate destination for the latest mobile phone specifications, prices, and news. Stay updated with the fast-moving mobile world.
             </p>
             <div className="flex items-center gap-4">
-              <a href="#" className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-primary transition-all"><Facebook className="h-5 w-5" /></a>
-              <a href="#" className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-primary transition-all"><Twitter className="h-5 w-5" /></a>
-              <a href="#" className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-primary transition-all"><Instagram className="h-5 w-5" /></a>
-              <a href="#" className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-primary transition-all"><Youtube className="h-5 w-5" /></a>
+              <a href="#" className="text-muted-foreground hover:text-[#1a3a5a] transition-colors"><Facebook className="h-5 w-5" /></a>
+              <a href="#" className="text-muted-foreground hover:text-[#1a3a5a] transition-colors"><Twitter className="h-5 w-5" /></a>
+              <a href="#" className="text-muted-foreground hover:text-[#1a3a5a] transition-colors"><Instagram className="h-5 w-5" /></a>
+              <a href="#" className="text-muted-foreground hover:text-[#1a3a5a] transition-colors"><Youtube className="h-5 w-5" /></a>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-black text-xs uppercase text-white mb-6 tracking-widest flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-secondary rounded-full"></div>
-              Quick Links
-            </h3>
-            <ul className="space-y-4 text-sm">
-              <li><a href="/" className="text-slate-400 hover:text-secondary font-semibold transition-colors flex items-center gap-1 group">
-                <ChevronRight className="h-3 w-3 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" /> Home
-              </a></li>
-              <li><a href="/news" className="text-slate-400 hover:text-secondary font-semibold transition-colors flex items-center gap-1 group">
-                <ChevronRight className="h-3 w-3 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" /> Latest News
-              </a></li>
-              <li><a href="/search?q=" className="text-slate-400 hover:text-secondary font-semibold transition-colors flex items-center gap-1 group">
-                <ChevronRight className="h-3 w-3 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" /> All Mobile Phones
-              </a></li>
-              <li><a href="/contact" className="text-slate-400 hover:text-secondary font-semibold transition-colors flex items-center gap-1 group">
-                <ChevronRight className="h-3 w-3 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" /> Contact Us
-              </a></li>
+            <h3 className="font-bold text-sm uppercase text-[#1a3a5a] mb-5 tracking-wider">Quick Links</h3>
+            <ul className="space-y-3 text-sm">
+              <li><a href="/" className="text-muted-foreground hover:text-[#1a3a5a] font-medium transition-colors">Home</a></li>
+              <li><a href="/news" className="text-muted-foreground hover:text-[#1a3a5a] font-medium transition-colors">Latest News</a></li>
+              <li><a href="/search?q=" className="text-muted-foreground hover:text-[#1a3a5a] font-medium transition-colors">All Mobile Phones</a></li>
+              <li><a href="/contact" className="text-muted-foreground hover:text-[#1a3a5a] font-medium transition-colors">Contact Us</a></li>
             </ul>
           </div>
 
           {/* Popular Brands */}
           <div>
-            <h3 className="font-black text-xs uppercase text-white mb-6 tracking-widest flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-              Popular Brands
-            </h3>
-            <ul className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+            <h3 className="font-bold text-sm uppercase text-[#1a3a5a] mb-5 tracking-wider">Popular Brands</h3>
+            <ul className="grid grid-cols-2 gap-3 text-sm">
               {brands.length > 0 ? brands.map(brand => (
                 <li key={brand.id}>
-                  <a href={`/brand/${brand.slug}`} className="text-slate-400 hover:text-primary font-semibold transition-colors flex items-center gap-1 group">
-                    <div className="w-1 h-1 bg-slate-700 rounded-full group-hover:bg-primary transition-colors"></div>
+                  <a href={`/brand/${brand.slug}`} className="text-muted-foreground hover:text-[#1a3a5a] font-medium transition-colors">
                     {brand.name}
                   </a>
                 </li>
               )) : (
-                <li className="text-slate-500 text-xs">Loading brands...</li>
+                <li className="text-muted-foreground text-xs">Loading brands...</li>
               )}
-              <li className="col-span-2 pt-2">
-                <a href="/search?q=" className="text-primary font-black uppercase text-[10px] tracking-widest hover:underline transition-all">
-                  Browse All Brands →
-                </a>
-              </li>
+              <li><a href="/search?q=" className="text-[#1a3a5a] font-bold hover:underline transition-colors mt-1 block">All Brands</a></li>
             </ul>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+        <div className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] font-medium text-muted-foreground">
           <p>© {new Date().getFullYear()} MobiSpec. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <a href="/privacy" className="hover:text-white transition-colors">Privacy</a>
-            <a href="/terms" className="hover:text-white transition-colors">Terms</a>
-            <a href="/contact" className="hover:text-white transition-colors">Contact</a>
-            <a href="/sitemap.xml" className="hover:text-white transition-colors">Sitemap</a>
+            <a href="/privacy" className="hover:text-[#1a3a5a] transition-colors">Privacy Policy</a>
+            <a href="/terms" className="hover:text-[#1a3a5a] transition-colors">Terms of Service</a>
+            <a href="/contact" className="hover:text-[#1a3a5a] transition-colors">Contact Us</a>
+            <a href="/sitemap.xml" className="hover:text-[#1a3a5a] transition-colors">Sitemap</a>
           </div>
         </div>
       </div>

@@ -61,87 +61,97 @@ export function Sidebar({ showPriceFilters = true, showFeatureFilters = true }: 
   return (
     <aside className="space-y-4">
       {/* Search by Brand */}
-      <section className="bg-white border rounded-lg shadow-sm overflow-hidden border-indigo-100">
-        <div className="bg-indigo-600 text-white px-4 py-2.5 text-center text-[10px] font-black uppercase flex items-center justify-center gap-2 tracking-widest">
-          <Smartphone className="h-3.5 w-3.5" /> Browse Brands
+      <section className="bg-white border rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
+          Search by Brand
         </div>
-        <div className="p-0 flex flex-col divide-y divide-slate-50">
-          {brands.map(brand => (
-            <a key={brand.id} href={`/brand/${brand.slug}`} className="px-3.5 py-2 text-[11px] font-semibold text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 transition-all flex justify-between items-center group">
-              <span>{brand.name}</span>
-              <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5" />
+        <div className="p-2 grid grid-cols-1 gap-0.5">
+          {brands.length > 0 ? brands.map(brand => (
+            <a key={brand.id} href={`/brand/${brand.slug}`} className="px-3 py-1.5 text-[11px] font-medium hover:bg-muted transition-colors border-b last:border-0 border-muted/50 flex justify-between items-center group">
+              <span>{brand.name} Mobile</span>
+              <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
             </a>
-          ))}
+          )) : (
+            <div className="px-3 py-4 text-center text-[10px] text-muted-foreground italic">No brands found.</div>
+          )}
         </div>
       </section>
 
       {/* Search by Price */}
       {showPriceFilters && (
-        <section className="bg-white border rounded-lg shadow-sm overflow-hidden border-rose-100">
-          <div className="bg-rose-500 text-white px-4 py-2.5 text-center text-[10px] font-black uppercase flex items-center justify-center gap-2 tracking-widest">
-            <Filter className="h-3.5 w-3.5" /> Search by Price
+        <section className="bg-white border rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
+            Search by Price
           </div>
-          <div className="p-0 flex flex-col divide-y divide-slate-50">
-            {priceRanges.map(range => (
-              <a key={range.id} href={`/price-range?min=${range.minPrice}&max=${range.maxPrice}&label=${encodeURIComponent(range.label)}`} className="px-3.5 py-2 text-[11px] font-semibold text-slate-600 hover:bg-rose-50 hover:text-rose-700 transition-all">
+          <div className="p-2 grid grid-cols-1 gap-0.5 text-[11px] font-medium">
+            {priceRanges.length > 0 ? priceRanges.map(range => (
+              <a key={range.id} href={`/price-range?min=${range.minPrice}&max=${range.maxPrice}&label=${encodeURIComponent(range.label)}`} className="px-3 py-1.5 hover:bg-muted border-b border-muted/50 block">
                 {range.label}
+              </a>
+            )) : (
+              <div className="px-3 py-4 text-center text-[10px] text-muted-foreground italic">No price ranges found.</div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Search by Network */}
+      {networks.length > 0 && (
+        <section className="bg-white border rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
+            Search by Network
+          </div>
+          <div className="p-2 grid grid-cols-1 gap-0.5 text-[11px] font-medium">
+            {networks.map(n => (
+              <a key={n.id} href={`/network/${n.slug}`} className="px-3 py-1.5 hover:bg-muted border-b border-muted/50 block">
+                {n.name}
               </a>
             ))}
           </div>
         </section>
       )}
 
-      {/* Search by Network */}
-      <section className="bg-white border rounded-lg shadow-sm overflow-hidden border-cyan-100">
-        <div className="bg-cyan-500 text-white px-4 py-2.5 text-center text-[10px] font-black uppercase flex items-center justify-center gap-2 tracking-widest">
-          <Wifi className="h-3.5 w-3.5" /> Search by Network
-        </div>
-        <div className="p-0 flex flex-col divide-y divide-slate-50">
-          {networks.map(n => (
-            <a key={n.id} href={`/network/${n.slug}`} className="px-3.5 py-2 text-[11px] font-semibold text-slate-600 hover:bg-cyan-50 hover:text-cyan-700 transition-all">
-              {n.name}
-            </a>
-          ))}
-        </div>
-      </section>
-
       {/* Search by RAM */}
-      <section className="bg-white border rounded-lg shadow-sm overflow-hidden border-amber-100">
-        <div className="bg-amber-500 text-white px-4 py-2.5 text-center text-[10px] font-black uppercase flex items-center justify-center gap-2 tracking-widest">
-          <Cpu className="h-3.5 w-3.5" /> Search by RAM
-        </div>
-        <div className="p-0 flex flex-col divide-y divide-slate-50">
-          {ramOptions.map(r => (
-            <a key={r.id} href={`/ram/${r.slug}`} className="px-3.5 py-2 text-[11px] font-semibold text-slate-600 hover:bg-amber-50 hover:text-amber-700 transition-all">
-              {r.label}
-            </a>
-          ))}
-        </div>
-      </section>
+      {ramOptions.length > 0 && (
+        <section className="bg-white border rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
+            Search by RAM
+          </div>
+          <div className="p-2 grid grid-cols-1 gap-0.5 text-[11px] font-medium">
+            {ramOptions.map(r => (
+              <a key={r.id} href={`/ram/${r.slug}`} className="px-3 py-1.5 hover:bg-muted border-b border-muted/50 block">
+                {r.label}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Search by Screen */}
-      <section className="bg-white border rounded-lg shadow-sm overflow-hidden border-emerald-100">
-        <div className="bg-emerald-500 text-white px-4 py-2.5 text-center text-[10px] font-black uppercase flex items-center justify-center gap-2 tracking-widest">
-          <Monitor className="h-3.5 w-3.5" /> Search by Screen
-        </div>
-        <div className="p-0 flex flex-col divide-y divide-slate-50">
-          {screenSizes.map(s => (
-            <a key={s.id} href={`/screen/${s.slug}`} className="px-3.5 py-2 text-[11px] font-semibold text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition-all">
-              {s.label}
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* Search by Cam / Feature */}
-      {showFeatureFilters && (
-        <section className="bg-white border rounded-lg shadow-sm overflow-hidden border-violet-100">
-          <div className="bg-violet-500 text-white px-4 py-2.5 text-center text-[10px] font-black uppercase flex items-center justify-center gap-2 tracking-widest">
-            <Zap className="h-3.5 w-3.5" /> Cam / Feature
+      {screenSizes.length > 0 && (
+        <section className="bg-white border rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
+            Search by Screen
           </div>
-          <div className="p-0 flex flex-col divide-y divide-slate-50">
+          <div className="p-2 grid grid-cols-1 gap-0.5 text-[11px] font-medium">
+            {screenSizes.map(s => (
+              <a key={s.id} href={`/screen/${s.slug}`} className="px-3 py-1.5 hover:bg-muted border-b border-muted/50 block">
+                {s.label}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Search by Feature */}
+      {showFeatureFilters && mobileFeatures.length > 0 && (
+        <section className="bg-white border rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
+            Search by Cam / Feature
+          </div>
+          <div className="p-2 grid grid-cols-1 gap-0.5 text-[11px] font-medium">
             {mobileFeatures.map(f => (
-              <a key={f.id} href={`/feature/${f.slug}`} className="px-3.5 py-2 text-[11px] font-semibold text-slate-600 hover:bg-violet-50 hover:text-violet-700 transition-all">
+              <a key={f.id} href={`/feature/${f.slug}`} className="px-3 py-1.5 hover:bg-muted border-b border-muted/50 block">
                 {f.label}
               </a>
             ))}
@@ -150,18 +160,20 @@ export function Sidebar({ showPriceFilters = true, showFeatureFilters = true }: 
       )}
 
       {/* Search by OS */}
-      <section className="bg-white border rounded-lg shadow-sm overflow-hidden border-blue-100">
-        <div className="bg-blue-500 text-white px-4 py-2.5 text-center text-[10px] font-black uppercase flex items-center justify-center gap-2 tracking-widest">
-          <Disc className="h-3.5 w-3.5" /> Search by OS
-        </div>
-        <div className="p-0 flex flex-col divide-y divide-slate-50">
-          {osOptions.map(o => (
-            <a key={o.id} href={`/os/${o.slug}`} className="px-3.5 py-2 text-[11px] font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-700 transition-all">
-              {o.name}
-            </a>
-          ))}
-        </div>
-      </section>
+      {osOptions.length > 0 && (
+        <section className="bg-white border rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-[#1a3a5a] text-white px-4 py-2 text-center text-xs font-bold uppercase">
+            Search by OS
+          </div>
+          <div className="p-2 grid grid-cols-1 gap-0.5 text-[11px] font-medium">
+            {osOptions.map(o => (
+              <a key={o.id} href={`/os/${o.slug}`} className="px-3 py-1.5 hover:bg-muted border-b border-muted/50 block">
+                {o.name}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
     </aside>
   );
 }

@@ -34,19 +34,15 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2 group">
-            <div className="p-1.5 bg-linear-to-br from-primary via-indigo-500 to-secondary rounded-lg text-white group-hover:scale-105 transition-all shadow-md shadow-primary/20">
-              <Smartphone className="h-6 w-6" />
-            </div>
-            <span className="text-xl font-black tracking-tighter uppercase text-slate-800 flex items-center">
-              Mobi<span className="text-primary">Spec</span><span className="text-muted-foreground text-[10px] lowercase ml-0.5 opacity-70">.com</span>
-            </span>
+          <a href="/" className="flex items-center gap-2">
+            <Smartphone className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-black tracking-tighter uppercase text-slate-800">MobiSpec<span className="text-muted-foreground text-sm lowercase">.com</span></span>
           </a>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-1">
-            <a href="/" className="px-4 py-2 text-sm font-bold text-slate-700 hover:text-primary hover:bg-primary/5 rounded-md transition-all">Home</a>
-            <a href="/news" className="px-4 py-2 text-sm font-bold text-slate-700 hover:text-secondary hover:bg-secondary/5 rounded-md transition-all">News</a>
+          <div className="hidden md:flex items-center gap-6">
+            <a href="/" className="text-sm font-bold text-slate-700 hover:text-primary transition-colors">Home</a>
+            <a href="/news" className="text-sm font-bold text-slate-700 hover:text-primary transition-colors">News</a>
           </div>
 
           {/* Actions */}
