@@ -210,18 +210,9 @@ export function Home() {
               <div className="bg-[#f8f9fa] border-b px-4 py-2">
                 <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Coming Soon Mobiles Prices in Pakistan</h2>
               </div>
-              <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2">
                 {comingSoonPhones.length > 0 ? comingSoonPhones.map(phone => (
-                  <div key={phone.id} className="flex flex-col items-center text-center">
-                    <div className="aspect-[3/4] w-24 relative mb-2">
-                      <img src={phone.images?.[0]} alt={phone.name} className="object-cover w-full h-full rounded-md" referrerPolicy="no-referrer" />
-                    </div>
-                    <h3 className="text-[10px] font-bold leading-tight mb-1">{phone.name}</h3>
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Expected Price</p>
-                    <p className="text-[10px] font-bold text-[#d32f2f]">
-                      {phone.currency} {phone.price}
-                    </p>
-                  </div>
+                  <PhoneCard key={phone.id} phone={phone} />
                 )) : (
                   <div className="col-span-full py-8 text-center text-muted-foreground text-xs italic">
                     No coming soon mobiles announced yet.
