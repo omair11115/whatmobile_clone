@@ -23,7 +23,7 @@ export function PhoneCard({ phone }: PhoneCardProps) {
           />
         </div>
         <div className="space-y-0.5">
-          <p className="text-[9px] font-bold text-[#1a3a5a]/70 uppercase tracking-tight">
+          <p className="text-[12px] font-bold text-[#1a3a5a] group-hover:text-primary line-clamp-2 leading-tight min-h-[20px]">
             {brand}
           </p>
           <h3 className="text-[10px] font-bold text-[#1a3a5a] group-hover:text-primary line-clamp-2 leading-tight min-h-[20px]">
