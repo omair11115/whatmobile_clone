@@ -6,17 +6,18 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Zap, RefreshCw, CheckCircle2, AlertCircle, Plus, Edit2, Trash2, LogOut, Smartphone, FileText, Settings, Image as ImageIcon, Copy, Check, Search, Type } from 'lucide-react';
-import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption, GalleryImage } from '@/src/types';
+import { Smartphone, FileText, Settings, Image as ImageIcon, Copy, Check, Search, Type, CheckCircle, Zap, RefreshCw, Plus, Edit2, Trash2 } from 'lucide-react';
+import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption, GalleryImage, UserRole, ContentStatus } from '@/src/types';
+import { useAuth } from '@/src/lib/auth';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 
 export function Admin() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { user, login, loginWithCredentials } = useAuth();
+  
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-
   const [mobiles, setMobiles] = useState<Mobile[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -103,39 +104,39 @@ export function Admin() {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    if (token) setIsAuthenticated(true);
-    if (token) {
+    if (user) {
+      if (user.role === UserRole.USER) {
+        // Normal users shouldn't be here
+        window.location.href = '/';
+        return;
+      }
       fetchData();
     }
-  }, [isAuthenticated]);
+  }, [user]);
+
+  const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
+  const isManager = user?.role === UserRole.MANAGER || isSuperAdmin;
+  const isSuperAdminValue = user?.role === UserRole.SUPER_ADMIN; // for helper
 
   const fetchData = async () => {
     try {
-      const [mobRes, postRes, brandRes, priceRes, netRes, ramRes, screenRes, featRes, osRes, imgRes] = await Promise.all([
-        fetch('/api/mobiles'),
-        fetch('/api/posts'),
-        fetch('/api/brands'),
-        fetch('/api/price-ranges'),
-        fetch('/api/networks'),
-        fetch('/api/ram-options'),
-        fetch('/api/screen-sizes'),
-        fetch('/api/mobile-features'),
-        fetch('/api/os-options'),
-        fetch('/api/images')
-      ]);
-      const [mobData, postData, brandData, priceData, netData, ramData, screenData, featData, osData, imgData] = await Promise.all([
-        mobRes.json(),
-        postRes.json(),
-        brandRes.json(),
-        priceRes.json(),
-        netRes.json(),
-        ramRes.json(),
-        screenRes.json(),
-        featRes.json(),
-        osRes.json(),
-        imgRes.json()
-      ]);
+      const endpoints = [
+        '/api/mobiles/admin',
+        '/api/posts/admin',
+        '/api/brands',
+        '/api/price-ranges',
+        '/api/networks',
+        '/api/ram-options',
+        '/api/screen-sizes',
+        '/api/mobile-features',
+        '/api/os-options',
+        '/api/images'
+      ];
+      
+      const responses = await Promise.all(endpoints.map(url => fetch(url)));
+      const data = await Promise.all(responses.map(res => res.json()));
+
+      const [mobData, postData, brandData, priceData, netData, ramData, screenData, featData, osData, imgData] = data;
 
       if (Array.isArray(mobData)) setMobiles(mobData);
       if (Array.isArray(postData)) setPosts(postData);
@@ -152,6 +153,19 @@ export function Admin() {
     }
   };
 
+  const handleApprove = async (type: 'mobiles' | 'posts', id: string) => {
+    try {
+      const res = await fetch(`/api/${type}/${id}/approve`, { method: 'POST' });
+      if (res.ok) {
+        fetchData();
+      } else {
+        alert("Failed to approve");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const slugify = (text: string) => {
     return text
       .toLowerCase()
@@ -161,30 +175,10 @@ export function Admin() {
       .replace(/^-+|-+$/g, '');
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem('adminToken', data.token);
-        setIsAuthenticated(true);
-        setLoginError('');
-      } else {
-        setLoginError(data.error);
-      }
-    } catch (err) {
-      setLoginError("Login failed");
-    }
-  };
-
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    setIsAuthenticated(false);
+    // We can use a logout pattern if needed, but Google Sign-in logout is handled via auth lib
+    // For now we'll just reload to clear state
+    window.location.reload();
   };
 
   const handleUploadImage = async (e: React.FormEvent) => {
@@ -509,27 +503,57 @@ export function Admin() {
     }
   };
 
-  if (!isAuthenticated) {
+  if (!user || (user.role !== UserRole.SUPER_ADMIN && user.role !== UserRole.MANAGER)) {
+    const handleCredentialLogin = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoginError('');
+      const res = await loginWithCredentials(username, password);
+      if (!res.success) {
+        setLoginError(res.error || 'Login failed');
+      }
+    };
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-sm">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-black uppercase">Admin Login</CardTitle>
-            <CardDescription>Enter your credentials to manage the platform</CardDescription>
+            <CardTitle className="text-2xl font-black uppercase">Staff Entrance</CardTitle>
+            <CardDescription>Restricted area for admins and managers</CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
+          <CardContent className="space-y-4">
+            <form onSubmit={handleCredentialLogin} className="space-y-3">
+              <div className="space-y-1">
                 <Label htmlFor="username">Username</Label>
-                <Input id="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="admin" required />
+                <Input 
+                  id="username" 
+                  value={username} 
+                  onChange={e => setUsername(e.target.value)} 
+                  placeholder="Enter username"
+                  required 
+                />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+                <Input 
+                  id="password" 
+                  type="password" 
+                  value={password} 
+                  onChange={e => setPassword(e.target.value)} 
+                  placeholder="Enter password"
+                  required 
+                />
               </div>
-              {loginError && <p className="text-xs text-destructive font-medium">{loginError}</p>}
-              <Button type="submit" className="w-full font-bold uppercase">Login</Button>
+              {loginError && <p className="text-xs text-destructive font-bold">{loginError}</p>}
+              <Button type="submit" className="w-full font-bold uppercase tracking-wider">Login</Button>
             </form>
+            
+            <div className="relative py-2">
+              <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+              <div className="relative flex justify-center text-[10px] uppercase"><span className="bg-white px-2 text-muted-foreground">Or continue with</span></div>
+            </div>
+
+            <Button variant="outline" onClick={login} className="w-full font-bold">Sign in with Google</Button>
+            <p className="text-[10px] text-muted-foreground text-center">Note: Managers can submit content for review, while Super Admins can publish it live.</p>
           </CardContent>
         </Card>
       </div>
@@ -540,13 +564,24 @@ export function Admin() {
     <div className="min-h-screen bg-muted/10 pb-20">
       {/* Admin Header */}
       <div className="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-10">
-        <div className="flex items-center gap-2">
-          <Settings className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-black uppercase tracking-tight">Admin Dashboard</h1>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Settings className="h-5 w-5 text-primary" />
+            <h1 className="text-lg font-black uppercase tracking-tight">Staff Panel</h1>
+          </div>
+          <Badge variant="outline" className="font-bold uppercase text-[10px]">
+            {user.role}
+          </Badge>
         </div>
-        <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground hover:text-destructive">
-          <LogOut className="h-4 w-4 mr-2" /> Logout
-        </Button>
+        <div className="flex items-center gap-4">
+          <div className="text-right hidden sm:block">
+            <p className="text-[10px] font-bold">{user.name}</p>
+            <p className="text-[8px] text-muted-foreground">{user.email}</p>
+          </div>
+          <Button variant="ghost" size="sm" onClick={() => (window.location.href = '/')} className="text-muted-foreground hover:text-primary">
+            Main Site
+          </Button>
+        </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
@@ -554,11 +589,18 @@ export function Admin() {
           <TabsList className="grid grid-cols-7 max-w-4xl mx-auto">
             <TabsTrigger value="mobiles" className="font-bold uppercase text-[10px]"><Smartphone className="h-3 w-3 mr-1" /> Mobiles</TabsTrigger>
             <TabsTrigger value="posts" className="font-bold uppercase text-[10px]"><FileText className="h-3 w-3 mr-1" /> Posts</TabsTrigger>
-            <TabsTrigger value="brands" className="font-bold uppercase text-[10px]"><Smartphone className="h-3 w-3 mr-1" /> Brands</TabsTrigger>
-            <TabsTrigger value="gallery" className="font-bold uppercase text-[10px]"><ImageIcon className="h-3 w-3 mr-1" /> Gallery</TabsTrigger>
-            <TabsTrigger value="prices" className="font-bold uppercase text-[10px]"><Zap className="h-3 w-3 mr-1" /> Prices</TabsTrigger>
-            <TabsTrigger value="attributes" className="font-bold uppercase text-[10px]"><Settings className="h-3 w-3 mr-1" /> Attributes</TabsTrigger>
-            <TabsTrigger value="automation" className="font-bold uppercase text-[10px]"><RefreshCw className="h-3 w-3 mr-1" /> AI Sync</TabsTrigger>
+            {isSuperAdmin && (
+              <>
+                <TabsTrigger value="brands" className="font-bold uppercase text-[10px]"><Smartphone className="h-3 w-3 mr-1" /> Brands</TabsTrigger>
+                <TabsTrigger value="gallery" className="font-bold uppercase text-[10px]"><ImageIcon className="h-3 w-3 mr-1" /> Gallery</TabsTrigger>
+                <TabsTrigger value="prices" className="font-bold uppercase text-[10px]"><Zap className="h-3 w-3 mr-1" /> Prices</TabsTrigger>
+                <TabsTrigger value="attributes" className="font-bold uppercase text-[10px]"><Settings className="h-3 w-3 mr-1" /> Attributes</TabsTrigger>
+                <TabsTrigger value="automation" className="font-bold uppercase text-[10px]"><RefreshCw className="h-3 w-3 mr-1" /> AI Sync</TabsTrigger>
+              </>
+            )}
+            {isManager && (
+              <TabsTrigger value="gallery" className="font-bold uppercase text-[10px]"><ImageIcon className="h-3 w-3 mr-1" /> Gallery</TabsTrigger>
+            )}
           </TabsList>
 
           {/* Mobiles Management */}
@@ -980,6 +1022,7 @@ export function Admin() {
                     <th className="px-4 py-3 font-bold">Name</th>
                     <th className="px-4 py-3 font-bold">Brand</th>
                     <th className="px-4 py-3 font-bold">Price</th>
+                    <th className="px-4 py-3 font-bold text-center">Status</th>
                     <th className="px-4 py-3 font-bold text-right">Actions</th>
                   </tr>
                 </thead>
@@ -989,13 +1032,25 @@ export function Admin() {
                       <td className="px-4 py-3 font-medium">{mobile.name}</td>
                       <td className="px-4 py-3">{mobile.brand}</td>
                       <td className="px-4 py-3">{mobile.currency}{mobile.price}</td>
+                      <td className="px-4 py-3 text-center">
+                        <Badge variant={mobile.status === 'published' ? 'default' : 'secondary'} className="text-[10px] uppercase font-bold">
+                          {mobile.status}
+                        </Badge>
+                      </td>
                       <td className="px-4 py-3 text-right space-x-2">
+                        {isSuperAdmin && mobile.status === 'pending' && (
+                          <Button variant="outline" size="sm" onClick={() => handleApprove('mobiles', mobile.id)} className="h-8 border-green-600 text-green-600 hover:bg-green-50">
+                            <CheckCircle className="h-3 w-3 mr-1" /> Publish
+                          </Button>
+                        )}
                         <Button variant="ghost" size="icon" onClick={() => setEditingMobile(mobile)} className="h-8 w-8 text-primary">
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDeleteMobile(mobile.id)} className="h-8 w-8 text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {isSuperAdmin && (
+                          <Button variant="ghost" size="icon" onClick={() => handleDeleteMobile(mobile.id)} className="h-8 w-8 text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -1008,7 +1063,7 @@ export function Admin() {
           <TabsContent value="posts" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold text-[#1a3a5a]">Manage Blog Posts</h2>
-              <Button size="sm" onClick={() => setEditingPost({ title: '', slug: '', content: '', author: 'Admin', tags: [] })}>
+              <Button size="sm" onClick={() => setEditingPost({ title: '', slug: '', content: '', author: 'Admin', tags: [], status: 'published' })}>
                 <Plus className="h-4 w-4 mr-2" /> Add New Post
               </Button>
             </div>
@@ -1088,6 +1143,7 @@ export function Admin() {
                     <th className="px-4 py-3 font-bold">Title</th>
                     <th className="px-4 py-3 font-bold">Author</th>
                     <th className="px-4 py-3 font-bold">Date</th>
+                    <th className="px-4 py-3 font-bold text-center">Status</th>
                     <th className="px-4 py-3 font-bold text-right">Actions</th>
                   </tr>
                 </thead>
@@ -1097,13 +1153,25 @@ export function Admin() {
                       <td className="px-4 py-3 font-medium line-clamp-1">{post.title}</td>
                       <td className="px-4 py-3">{post.author}</td>
                       <td className="px-4 py-3 text-muted-foreground">{new Date(post.created_at).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-center">
+                        <Badge variant={post.status === 'published' ? 'default' : 'secondary'} className="text-[10px] uppercase font-bold">
+                          {(post as any).status || 'published'}
+                        </Badge>
+                      </td>
                       <td className="px-4 py-3 text-right space-x-2">
+                        {isSuperAdmin && (post as any).status === 'pending' && (
+                          <Button variant="outline" size="sm" onClick={() => handleApprove('posts', post.id)} className="h-8 border-green-600 text-green-600 hover:bg-green-50">
+                            <CheckCircle className="h-3 w-3 mr-1" /> Publish
+                          </Button>
+                        )}
                         <Button variant="ghost" size="icon" onClick={() => setEditingPost(post)} className="h-8 w-8 text-primary">
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDeletePost(post.id)} className="h-8 w-8 text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {isSuperAdmin && (
+                          <Button variant="ghost" size="icon" onClick={() => handleDeletePost(post.id)} className="h-8 w-8 text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -1116,7 +1184,7 @@ export function Admin() {
           <TabsContent value="brands" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold text-[#1a3a5a]">Manage Brands</h2>
-              <Button size="sm" onClick={() => setEditingBrand({ name: '', slug: '', logo: '', description: '' })}>
+              <Button size="sm" onClick={() => setEditingBrand({ name: '', slug: '', logo: '', description: '', status: 'published' })}>
                 <Plus className="h-4 w-4 mr-2" /> Add New Brand
               </Button>
             </div>
@@ -1173,9 +1241,11 @@ export function Admin() {
                         <Button variant="ghost" size="icon" onClick={() => setEditingBrand(brand)} className="h-8 w-8 text-primary">
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDeleteBrand(brand.id)} className="h-8 w-8 text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {isSuperAdmin && (
+                          <Button variant="ghost" size="icon" onClick={() => handleDeleteBrand(brand.id)} className="h-8 w-8 text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -1273,9 +1343,11 @@ export function Admin() {
                         <Button size="icon" variant="secondary" onClick={() => copyToClipboard(img.url)} title="Copy Link">
                           {copyStatus === img.url ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                         </Button>
-                        <Button size="icon" variant="destructive" onClick={() => handleDeleteImage(img.id)} title="Delete Image">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {isSuperAdmin && (
+                          <Button variant="ghost" size="icon" onClick={() => handleDeleteImage(img.id)} title="Delete Image">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                     <div className="p-2 text-[10px] space-y-1">
@@ -1368,9 +1440,11 @@ export function Admin() {
                         <Button variant="ghost" size="icon" onClick={() => setEditingPriceRange(range)} className="h-8 w-8 text-primary">
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDeletePriceRange(range.id)} className="h-8 w-8 text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {isSuperAdmin && (
+                          <Button variant="ghost" size="icon" onClick={() => handleDeletePriceRange(range.id)} className="h-8 w-8 text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -1413,7 +1487,9 @@ export function Admin() {
                   {networks.map(n => (
                     <div key={n.id} className="flex justify-between p-2 border-b last:border-0 items-center">
                       <span>{n.name}</span>
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteAttribute('networks', n.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      {isSuperAdmin && (
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteAttribute('networks', n.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1441,7 +1517,9 @@ export function Admin() {
                   {ramOptions.map(r => (
                     <div key={r.id} className="flex justify-between p-2 border-b last:border-0 items-center">
                       <span>{r.label}</span>
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteAttribute('ram-options', r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      {isSuperAdmin && (
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteAttribute('ram-options', r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1469,7 +1547,9 @@ export function Admin() {
                   {screenSizes.map(s => (
                     <div key={s.id} className="flex justify-between p-2 border-b last:border-0 items-center">
                       <span>{s.label}</span>
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteAttribute('screen-sizes', s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      {isSuperAdmin && (
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteAttribute('screen-sizes', s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1497,7 +1577,9 @@ export function Admin() {
                   {mobileFeatures.map(f => (
                     <div key={f.id} className="flex justify-between p-2 border-b last:border-0 items-center">
                       <span>{f.label}</span>
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteAttribute('mobile-features', f.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      {isSuperAdmin && (
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteAttribute('mobile-features', f.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1525,7 +1607,9 @@ export function Admin() {
                   {osOptions.map(o => (
                     <div key={o.id} className="flex justify-between p-2 border-b last:border-0 items-center">
                       <span>{o.name}</span>
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteAttribute('os-options', o.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      {isSuperAdmin && (
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteAttribute('os-options', o.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      )}
                     </div>
                   ))}
                 </div>

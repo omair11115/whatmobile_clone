@@ -1,5 +1,7 @@
 import "dotenv/config";
 import pg from 'pg';
+import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
 const { Pool } = pg;
 
 if (!process.env.DATABASE_URL) {
@@ -169,9 +171,12 @@ const initDb = async () => {
           query: `CREATE TABLE IF NOT EXISTS users (
             id TEXT PRIMARY KEY,
             google_id TEXT UNIQUE,
+            username TEXT UNIQUE,
+            password_hash TEXT,
             email TEXT UNIQUE,
             name TEXT,
             avatar TEXT,
+            role TEXT DEFAULT 'USER',
             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
           )`
         },
@@ -266,6 +271,30 @@ const initDb = async () => {
                     ALTER TABLE comments ADD COLUMN post_id TEXT;
                 END IF;
             END $$;`
+        },
+        {
+          name: 'approval workflow columns',
+          query: `DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='mobiles' AND column_name='status') THEN
+                    ALTER TABLE mobiles ADD COLUMN status TEXT DEFAULT 'published';
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='posts' AND column_name='status') THEN
+                    ALTER TABLE posts ADD COLUMN status TEXT DEFAULT 'published';
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='brands' AND column_name='status') THEN
+                    ALTER TABLE brands ADD COLUMN status TEXT DEFAULT 'published';
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='role') THEN
+                    ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'USER';
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='username') THEN
+                    ALTER TABLE users ADD COLUMN username TEXT UNIQUE;
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='password_hash') THEN
+                    ALTER TABLE users ADD COLUMN password_hash TEXT;
+                END IF;
+            END $$;`
         }
       ];
 
@@ -275,6 +304,35 @@ const initDb = async () => {
           console.log(`✅ Migration completed: ${m.name}`);
         } catch (e) {
           console.error(`❌ Error in migration ${m.name}:`, e);
+        }
+      }
+
+      // Seed specific users
+      console.log("Seeding specific users...");
+      const usersToSeed = [
+        {
+          username: 'nova_rider27',
+          password: 'X7@kL9!pQ2z',
+          role: 'SUPER_ADMIN',
+          name: 'Nova Rider'
+        },
+        {
+          username: 'pixel_forge88',
+          password: 'mT4#vZ1$yR8',
+          role: 'MANAGER',
+          name: 'Pixel Forge'
+        }
+      ];
+
+      for (const user of usersToSeed) {
+        const checkRes = await client.query('SELECT id FROM users WHERE username = $1', [user.username]);
+        if (checkRes.rows.length === 0) {
+          const passHash = await bcrypt.hash(user.password, 10);
+          await client.query(
+            'INSERT INTO users (id, username, password_hash, role, name) VALUES ($1, $2, $3, $4, $5)',
+            [uuidv4(), user.username, passHash, user.role, user.name]
+          );
+          console.log(`✅ User seeded: ${user.username} (${user.role})`);
         }
       }
 

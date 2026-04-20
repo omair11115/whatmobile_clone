@@ -9,6 +9,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import cookieParser from 'cookie-parser';
+import bcrypt from 'bcryptjs';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret-for-dev';
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -77,12 +78,64 @@ async function startServer() {
 
     try {
       const decoded: any = jwt.verify(token, JWT_SECRET);
-      req.user = decoded;
+      // Fetch fresh role from DB in case it changed
+      const userRes = await pool.query('SELECT role FROM users WHERE id = $1', [decoded.id]);
+      if (userRes.rows.length === 0) return res.status(401).json({ error: "User not found" });
+      
+      req.user = { ...decoded, role: userRes.rows[0].role };
       next();
     } catch (err) {
       res.status(401).json({ error: "Invalid or expired session" });
     }
   };
+
+  const authorize = (roles: string[]) => {
+    return (req: any, res: any, next: any) => {
+      if (!req.user) return res.status(401).json({ error: "Authentication required" });
+      if (!roles.includes(req.user.role)) {
+        return res.status(403).json({ error: "Permission denied" });
+      }
+      next();
+    };
+  };
+
+  // APPROVAL WORKFLOW API
+  app.post('/api/mobiles/:id/approve', authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
+    try {
+      await pool.query('UPDATE mobiles SET status = $1 WHERE id = $2', ['published', req.params.id]);
+      res.json({ success: true });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/posts/:id/approve', authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
+    try {
+      await pool.query('UPDATE posts SET status = $1 WHERE id = $2', ['published', req.params.id]);
+      res.json({ success: true });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Admin focused GETs
+  app.get('/api/mobiles/admin', authenticateUser, authorize(['SUPER_ADMIN', 'MANAGER']), async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM mobiles ORDER BY created_at DESC');
+      res.json(result.rows);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/api/posts/admin', authenticateUser, authorize(['SUPER_ADMIN', 'MANAGER']), async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM posts ORDER BY created_at DESC');
+      res.json(result.rows);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
 
   // Google OAuth Routes
   const getRedirectUri = (req: any) => {
@@ -152,11 +205,15 @@ async function startServer() {
       let userResult = await pool.query('SELECT * FROM users WHERE google_id = $1', [googleId]);
       let user;
 
+      // Logic for Super Admin detection
+      const superAdminEmails = (process.env.SUPER_ADMIN_EMAILS || '').split(',').map(e => e.trim());
+      const initialRole = superAdminEmails.includes(email || '') ? 'SUPER_ADMIN' : 'USER';
+
       if (userResult.rows.length === 0) {
         const id = uuidv4();
         const insertResult = await pool.query(
-          'INSERT INTO users (id, google_id, email, name, avatar) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-          [id, googleId, email, name, avatar]
+          'INSERT INTO users (id, google_id, email, name, avatar, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+          [id, googleId, email, name, avatar, initialRole]
         );
         user = insertResult.rows[0];
       } else {
@@ -165,7 +222,7 @@ async function startServer() {
 
       // Create session token
       const sessionToken = jwt.sign(
-        { id: user.id, email: user.email, name: user.name, avatar: user.avatar },
+        { id: user.id, email: user.email, name: user.name, avatar: user.avatar, role: user.role },
         JWT_SECRET,
         { expiresIn: '7d' }
       );
@@ -219,6 +276,41 @@ async function startServer() {
       sameSite: 'none',
     });
     res.json({ success: true });
+  });
+
+  app.post('/api/auth/login', async (req, res) => {
+    const { username, password } = req.body;
+    
+    try {
+      const userRes = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+      if (userRes.rows.length === 0) {
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      const user = userRes.rows[0];
+      const isValid = await bcrypt.compare(password, user.password_hash);
+      if (!isValid) {
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      const sessionToken = jwt.sign(
+        { id: user.id, email: user.email, name: user.name, avatar: user.avatar, role: user.role },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+
+      res.cookie('session_token', sessionToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.json({ success: true, user: { id: user.id, name: user.name, role: user.role } });
+    } catch (err: any) {
+      console.error("Login error:", err.message);
+      res.status(500).json({ error: "Server error during login" });
+    }
   });
 
   // COMMENTS & RATINGS API
@@ -375,7 +467,7 @@ async function startServer() {
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
   });
 
-  app.post("/api/images", upload.single('image'), async (req, res) => {
+  app.post("/api/images", authenticateUser, authorize(['SUPER_ADMIN', 'MANAGER']), upload.single('image'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No image provided" });
     const { description, altText } = req.body;
     const id = uuidv4();
@@ -431,7 +523,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/images/:id", async (req, res) => {
+  app.delete("/api/images/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     try {
       await pool.query('DELETE FROM gallery_images WHERE id = $1', [req.params.id]);
       res.json({ message: "Image deleted" });
@@ -443,21 +535,21 @@ async function startServer() {
   // BRAND MANAGEMENT
   app.get("/api/brands", async (req, res) => {
     try {
-      const result = await pool.query('SELECT * FROM brands ORDER BY name ASC');
+      const result = await pool.query("SELECT * FROM brands WHERE status = 'published' ORDER BY name ASC");
       res.json(result.rows);
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
   });
 
-  app.post("/api/brands", async (req, res) => {
+  app.post("/api/brands", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     console.log("POST /api/brands reached", req.body);
     const { name, slug, logo, description } = req.body;
     const id = uuidv4();
     try {
       const result = await pool.query(
-        'INSERT INTO brands (id, name, slug, logo, description) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [id, name, slug, logo, description]
+        'INSERT INTO brands (id, name, slug, logo, description, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        [id, name, slug, logo, description, 'published']
       );
       console.log("Brand created successfully:", result.rows[0].id);
       res.status(201).json(result.rows[0]);
@@ -467,7 +559,7 @@ async function startServer() {
     }
   });
 
-  app.put("/api/brands/:id", async (req, res) => {
+  app.put("/api/brands/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     const { name, slug, logo, description } = req.body;
     try {
       const result = await pool.query(
@@ -480,7 +572,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/brands/:id", async (req, res) => {
+  app.delete("/api/brands/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     try {
       await pool.query('DELETE FROM brands WHERE id = $1', [req.params.id]);
       res.json({ message: "Brand deleted successfully" });
@@ -505,7 +597,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/price-ranges", async (req, res) => {
+  app.post("/api/price-ranges", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     console.log("POST /api/price-ranges reached", req.body);
     const { label, minPrice, maxPrice, currency } = req.body;
     const id = uuidv4();
@@ -522,7 +614,7 @@ async function startServer() {
     }
   });
 
-  app.put("/api/price-ranges/:id", async (req, res) => {
+  app.put("/api/price-ranges/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     const { label, minPrice, maxPrice, currency } = req.body;
     try {
       const result = await pool.query(
@@ -535,7 +627,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/price-ranges/:id", async (req, res) => {
+  app.delete("/api/price-ranges/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     try {
       await pool.query('DELETE FROM price_ranges WHERE id = $1', [req.params.id]);
       res.json({ message: "Price range deleted successfully" });
@@ -554,7 +646,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/networks", async (req, res) => {
+  app.post("/api/networks", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     const { name, slug } = req.body;
     const id = uuidv4();
     try {
@@ -565,7 +657,7 @@ async function startServer() {
     }
   });
 
-  app.put("/api/networks/:id", async (req, res) => {
+  app.put("/api/networks/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     const { name, slug } = req.body;
     try {
       const result = await pool.query(
@@ -578,7 +670,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/networks/:id", async (req, res) => {
+  app.delete("/api/networks/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     try {
       await pool.query('DELETE FROM networks WHERE id = $1', [req.params.id]);
       res.json({ message: "Network deleted" });
@@ -597,7 +689,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/ram-options", async (req, res) => {
+  app.post("/api/ram-options", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     const { label, slug } = req.body;
     const id = uuidv4();
     try {
@@ -608,7 +700,7 @@ async function startServer() {
     }
   });
 
-  app.put("/api/ram-options/:id", async (req, res) => {
+  app.put("/api/ram-options/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     const { label, slug } = req.body;
     try {
       const result = await pool.query(
@@ -621,7 +713,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/ram-options/:id", async (req, res) => {
+  app.delete("/api/ram-options/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     try {
       await pool.query('DELETE FROM ram_options WHERE id = $1', [req.params.id]);
       res.json({ message: "RAM option deleted" });
@@ -640,7 +732,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/screen-sizes", async (req, res) => {
+  app.post("/api/screen-sizes", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     const { label, slug } = req.body;
     const id = uuidv4();
     try {
@@ -651,7 +743,7 @@ async function startServer() {
     }
   });
 
-  app.put("/api/screen-sizes/:id", async (req, res) => {
+  app.put("/api/screen-sizes/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     const { label, slug } = req.body;
     try {
       const result = await pool.query(
@@ -664,7 +756,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/screen-sizes/:id", async (req, res) => {
+  app.delete("/api/screen-sizes/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     try {
       await pool.query('DELETE FROM screen_sizes WHERE id = $1', [req.params.id]);
       res.json({ message: "Screen size deleted" });
@@ -683,7 +775,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/mobile-features", async (req, res) => {
+  app.post("/api/mobile-features", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     const { label, slug } = req.body;
     const id = uuidv4();
     try {
@@ -694,7 +786,7 @@ async function startServer() {
     }
   });
 
-  app.put("/api/mobile-features/:id", async (req, res) => {
+  app.put("/api/mobile-features/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     const { label, slug } = req.body;
     try {
       const result = await pool.query(
@@ -707,7 +799,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/mobile-features/:id", async (req, res) => {
+  app.delete("/api/mobile-features/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     try {
       await pool.query('DELETE FROM mobile_features WHERE id = $1', [req.params.id]);
       res.json({ message: "Feature deleted" });
@@ -726,7 +818,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/os-options", async (req, res) => {
+  app.post("/api/os-options", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     const { name, slug } = req.body;
     const id = uuidv4();
     try {
@@ -737,7 +829,7 @@ async function startServer() {
     }
   });
 
-  app.put("/api/os-options/:id", async (req, res) => {
+  app.put("/api/os-options/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     const { name, slug } = req.body;
     try {
       const result = await pool.query(
@@ -750,7 +842,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/os-options/:id", async (req, res) => {
+  app.delete("/api/os-options/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     try {
       await pool.query('DELETE FROM os_options WHERE id = $1', [req.params.id]);
       res.json({ message: "OS option deleted" });
@@ -836,7 +928,7 @@ async function startServer() {
     try {
       let query = 'SELECT * FROM mobiles';
       const params: any[] = [];
-      const conditions: string[] = [];
+      const conditions: string[] = ["status = 'published'"];
 
       if (brand) {
         conditions.push(`brand ILIKE $${params.length + 1}`);
@@ -910,7 +1002,7 @@ async function startServer() {
       const cleanSlug = slugify(rawSlug);
       // Try exact match then slugified match
       const result = await pool.query(
-        'SELECT * FROM mobiles WHERE LOWER(slug) = LOWER($1) OR LOWER(slug) = LOWER($2) LIMIT 1', 
+        "SELECT * FROM mobiles WHERE (LOWER(slug) = LOWER($1) OR LOWER(slug) = LOWER($2)) AND status = 'published' LIMIT 1", 
         [rawSlug, cleanSlug]
       );
       if (result.rows.length === 0) return res.status(404).json({ error: "Mobile not found" });
@@ -926,7 +1018,7 @@ async function startServer() {
       const rawSlug = req.params.slug;
       const cleanSlug = slugify(rawSlug);
       const phoneRes = await pool.query(
-        'SELECT * FROM mobiles WHERE LOWER(slug) = LOWER($1) OR LOWER(slug) = LOWER($2) LIMIT 1', 
+        "SELECT * FROM mobiles WHERE (LOWER(slug) = LOWER($1) OR LOWER(slug) = LOWER($2)) AND status = 'published' LIMIT 1", 
         [rawSlug, cleanSlug]
       );
       if (phoneRes.rows.length === 0) return res.status(404).json({ error: "Mobile not found" });
@@ -941,6 +1033,7 @@ async function startServer() {
       const result = await pool.query(`
         SELECT * FROM mobiles 
         WHERE id != $1 
+        AND status = 'published'
         AND (
           (CAST(price AS INTEGER) BETWEEN $2 AND $3)
           OR (specs->'camera'->>'main' ILIKE $4 AND $4 != '')
@@ -972,14 +1065,14 @@ async function startServer() {
       const rawSlug = req.params.slug;
       const cleanSlug = slugify(rawSlug);
       const phoneRes = await pool.query(
-        'SELECT brand FROM mobiles WHERE LOWER(slug) = LOWER($1) OR LOWER(slug) = LOWER($2) LIMIT 1', 
+        "SELECT brand, slug FROM mobiles WHERE (LOWER(slug) = LOWER($1) OR LOWER(slug) = LOWER($2)) AND status = 'published' LIMIT 1", 
         [rawSlug, cleanSlug]
       );
       if (phoneRes.rows.length === 0) return res.status(404).json({ error: "Mobile not found" });
       
       const brand = phoneRes.rows[0].brand;
       const actualSlug = phoneRes.rows[0].slug; // Get the canonical slug from DB
-      const result = await pool.query('SELECT * FROM mobiles WHERE brand = $1 AND LOWER(slug) != LOWER($2) LIMIT 6', [brand, actualSlug]);
+      const result = await pool.query("SELECT * FROM mobiles WHERE brand = $1 AND LOWER(slug) != LOWER($2) AND status = 'published' LIMIT 6", [brand, actualSlug]);
       res.json(result.rows);
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -992,11 +1085,13 @@ async function startServer() {
       // Filter by brand_id (brand slug) or search in text
       const result = await pool.query(`
         SELECT * FROM posts 
-        WHERE brand_id = $1
-        OR brand = $1
-        OR title ILIKE $2 
-        OR content ILIKE $2 
-        OR tags::text ILIKE $2
+        WHERE status = 'published' AND (
+          brand_id = $1
+          OR brand = $1
+          OR title ILIKE $2 
+          OR content ILIKE $2 
+          OR tags::text ILIKE $2
+        )
         ORDER BY created_at DESC 
         LIMIT 4
       `, [brand, `%${brand}%`]);
@@ -1012,7 +1107,7 @@ async function startServer() {
       const cleanSlug = slugify(rawSlug);
       // Try exact match then slugified match
       const result = await pool.query(
-        'SELECT * FROM posts WHERE LOWER(slug) = LOWER($1) OR LOWER(slug) = LOWER($2) LIMIT 1', 
+        "SELECT * FROM posts WHERE (LOWER(slug) = LOWER($1) OR LOWER(slug) = LOWER($2)) AND status = 'published' LIMIT 1", 
         [rawSlug, cleanSlug]
       );
       if (result.rows.length === 0) return res.status(404).json({ error: "Post not found" });
@@ -1022,18 +1117,19 @@ async function startServer() {
     }
   });
 
-  app.post("/api/mobiles", async (req, res) => {
+  app.post("/api/mobiles", authenticateUser, authorize(['SUPER_ADMIN', 'MANAGER']), async (req: any, res) => {
     const { name, brand, slug, price, currency, launchDate, images, specs, description, seoTitle, seoDescription, category, features, network, ram, screen_size, os, comingSoon } = req.body;
     const id = uuidv4();
     const cleanSlug = slugify(slug || name);
+    const status = req.user.role === 'SUPER_ADMIN' ? 'published' : 'pending';
     
     try {
       const query = `
-        INSERT INTO mobiles (id, name, brand, slug, price, currency, launch_date, images, specs, description, seo_title, seo_description, category, features, network, ram, screen_size, os, coming_soon)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
-        RETURNING id, slug
+        INSERT INTO mobiles (id, name, brand, slug, price, currency, launch_date, images, specs, description, seo_title, seo_description, category, features, network, ram, screen_size, os, coming_soon, status)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+        RETURNING id, slug, status
       `;
-      const values = [id, name, brand, cleanSlug, price, currency, launchDate, JSON.stringify(images), JSON.stringify(specs), description, seoTitle, seoDescription, category, JSON.stringify(features), network, ram, screen_size, os, comingSoon || false];
+      const values = [id, name, brand, cleanSlug, price, currency, launchDate, JSON.stringify(images), JSON.stringify(specs), description, seoTitle, seoDescription, category, JSON.stringify(features), network, ram, screen_size, os, comingSoon || false, status];
       const result = await pool.query(query, values);
       res.status(201).json(result.rows[0]);
     } catch (error: any) {
@@ -1276,20 +1372,22 @@ async function startServer() {
   });
 
   // Mobile Management
-  app.put("/api/mobiles/:id", async (req, res) => {
+  app.put("/api/mobiles/:id", authenticateUser, authorize(['SUPER_ADMIN', 'MANAGER']), async (req: any, res) => {
     const { name, brand, slug, price, currency, launchDate, images, specs, description, seoTitle, seoDescription, category, features, network, ram, screen_size, os, comingSoon } = req.body;
     const cleanSlug = slugify(slug || name);
+    const status = req.user.role === 'SUPER_ADMIN' ? 'published' : 'pending';
+    
     try {
       const query = `
         UPDATE mobiles 
         SET name = $1, brand = $2, slug = $3, price = $4, currency = $5, launch_date = $6, 
             images = $7, specs = $8, description = $9, seo_title = $10, seo_description = $11, 
             category = $12, features = $13, network = $14, ram = $15, screen_size = $16, os = $17,
-            coming_soon = $18
-        WHERE id = $19
-        RETURNING id, slug
+            coming_soon = $18, status = $19
+        WHERE id = $20
+        RETURNING id, slug, status
       `;
-      const values = [name, brand, cleanSlug, price, currency, launchDate, JSON.stringify(images), JSON.stringify(specs), description, seoTitle, seoDescription, category, JSON.stringify(features), network, ram, screen_size, os, comingSoon || false, req.params.id];
+      const values = [name, brand, cleanSlug, price, currency, launchDate, JSON.stringify(images), JSON.stringify(specs), description, seoTitle, seoDescription, category, JSON.stringify(features), network, ram, screen_size, os, comingSoon || false, status, req.params.id];
       const result = await pool.query(query, values);
       if (result.rows.length === 0) return res.status(404).json({ error: "Mobile not found" });
       res.json(result.rows[0]);
@@ -1298,7 +1396,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/mobiles/:id", async (req, res) => {
+  app.delete("/api/mobiles/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     try {
       const result = await pool.query('DELETE FROM mobiles WHERE id = $1 RETURNING id', [req.params.id]);
       if (result.rows.length === 0) return res.status(404).json({ error: "Mobile not found" });
@@ -1309,18 +1407,20 @@ async function startServer() {
   });
 
   // Post Management
-  app.put("/api/posts/:id", async (req, res) => {
+  app.put("/api/posts/:id", authenticateUser, authorize(['SUPER_ADMIN', 'MANAGER']), async (req: any, res) => {
     const { title, slug, content, author, image, tags, seoTitle, seoDescription, brand, brand_id } = req.body;
     const cleanSlug = slugify(slug || title);
+    const status = req.user.role === 'SUPER_ADMIN' ? 'published' : 'pending';
+    
     try {
       const query = `
         UPDATE posts 
         SET title = $1, slug = $2, content = $3, author = $4, image = $5, tags = $6, 
-            seo_title = $7, seo_description = $8, brand = $9, brand_id = $10
-        WHERE id = $11
-        RETURNING id, slug
+            seo_title = $7, seo_description = $8, brand = $9, brand_id = $10, status = $11
+        WHERE id = $12
+        RETURNING id, slug, status
       `;
-      const values = [title, cleanSlug, content, author, image, JSON.stringify(tags), seoTitle, seoDescription, brand, brand_id, req.params.id];
+      const values = [title, cleanSlug, content, author, image, JSON.stringify(tags), seoTitle, seoDescription, brand, brand_id, status, req.params.id];
       const result = await pool.query(query, values);
       if (result.rows.length === 0) return res.status(404).json({ error: "Post not found" });
       res.json(result.rows[0]);
@@ -1329,7 +1429,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/posts/:id", async (req, res) => {
+  app.delete("/api/posts/:id", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     try {
       const result = await pool.query('DELETE FROM posts WHERE id = $1 RETURNING id', [req.params.id]);
       if (result.rows.length === 0) return res.status(404).json({ error: "Post not found" });
@@ -1341,25 +1441,26 @@ async function startServer() {
 
   app.get("/api/posts", async (req, res) => {
     try {
-      const result = await pool.query('SELECT * FROM posts ORDER BY created_at DESC');
+      const result = await pool.query("SELECT * FROM posts WHERE status = 'published' ORDER BY created_at DESC");
       res.json(result.rows);
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
   });
 
-  app.post("/api/posts", async (req, res) => {
+  app.post("/api/posts", authenticateUser, authorize(['SUPER_ADMIN', 'MANAGER']), async (req: any, res) => {
     const { title, slug, content, author, image, tags, seoTitle, seoDescription, brand, brand_id } = req.body;
     const id = uuidv4();
     const cleanSlug = slugify(slug || title);
+    const status = req.user.role === 'SUPER_ADMIN' ? 'published' : 'pending';
     
     try {
       const query = `
-        INSERT INTO posts (id, title, slug, content, author, image, tags, seo_title, seo_description, brand, brand_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-        RETURNING id, slug
+        INSERT INTO posts (id, title, slug, content, author, image, tags, seo_title, seo_description, brand, brand_id, status)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        RETURNING id, slug, status
       `;
-      const values = [id, title, cleanSlug, content, author, image, JSON.stringify(tags), seoTitle, seoDescription, brand, brand_id];
+      const values = [id, title, cleanSlug, content, author, image, JSON.stringify(tags), seoTitle, seoDescription, brand, brand_id, status];
       const result = await pool.query(query, values);
       res.status(201).json(result.rows[0]);
     } catch (error: any) {
@@ -1443,7 +1544,7 @@ async function startServer() {
   });
 
   // Mock automation route
-  app.post("/api/sync-mobiles", async (req, res) => {
+  app.post("/api/sync-mobiles", authenticateUser, authorize(['SUPER_ADMIN']), async (req, res) => {
     // This would normally trigger a scraper or API fetch
     // For now, we'll return a success message
     res.json({ message: "Sync triggered successfully" });

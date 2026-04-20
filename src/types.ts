@@ -79,6 +79,7 @@ export interface Mobile {
   category: 'budget' | 'mid-range' | 'flagship';
   features: string[];
   comingSoon?: boolean;
+  status: ContentStatus;
   created_at: string;
 }
 
@@ -94,6 +95,7 @@ export interface BlogPost {
   brand_id?: string;
   seoTitle: string;
   seoDescription: string;
+  status: ContentStatus;
   created_at: string;
 }
 
@@ -103,6 +105,7 @@ export interface Brand {
   slug: string;
   logo?: string;
   description?: string;
+  status: ContentStatus;
 }
 
 export interface PriceRange {
@@ -154,11 +157,20 @@ export interface GalleryImage {
   created_at: string;
 }
 
+export enum UserRole {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  MANAGER = 'MANAGER',
+  USER = 'USER'
+}
+
+export type ContentStatus = 'published' | 'pending';
+
 export interface User {
   id: string;
   name: string;
   email: string;
   avatar?: string;
+  role: UserRole;
 }
 
 export interface Comment {
