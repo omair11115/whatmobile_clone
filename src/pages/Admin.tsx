@@ -604,7 +604,6 @@ export function Admin() {
             {isSuperAdmin && (
               <>
                 <TabsTrigger value="brands" className="font-bold uppercase text-[10px]"><Smartphone className="h-3 w-3 mr-1" /> Brands</TabsTrigger>
-                <TabsTrigger value="gallery" className="font-bold uppercase text-[10px]"><ImageIcon className="h-3 w-3 mr-1" /> Gallery</TabsTrigger>
                 <TabsTrigger value="prices" className="font-bold uppercase text-[10px]"><Zap className="h-3 w-3 mr-1" /> Prices</TabsTrigger>
                 <TabsTrigger value="attributes" className="font-bold uppercase text-[10px]"><Settings className="h-3 w-3 mr-1" /> Attributes</TabsTrigger>
                 <TabsTrigger value="automation" className="font-bold uppercase text-[10px]"><RefreshCw className="h-3 w-3 mr-1" /> AI Sync</TabsTrigger>
