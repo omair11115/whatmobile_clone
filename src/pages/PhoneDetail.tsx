@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { SEO } from '@/src/components/SEO';
 import { Sidebar } from '@/src/components/Sidebar';
+import { PhoneCard } from '@/src/components/PhoneCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -384,20 +385,9 @@ export function PhoneDetail() {
                 <div className="flex items-center justify-between border-b pb-2">
                   <h2 className="text-lg font-black text-[#1a3a5a] uppercase">Similar Phones</h2>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                   {similarMobiles.map((m) => (
-                    <a key={m.id} href={`/phone/${m.slug}`} className="bg-white border rounded hover:shadow-md transition-shadow p-3 flex flex-col items-center group">
-                      <div className="aspect-[3/4] w-full relative mb-2 overflow-hidden">
-                        <img 
-                          src={m.images[0]} 
-                          alt={m.name} 
-                          className="object-contain w-full h-full group-hover:scale-105 transition-transform" 
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                      <h3 className="text-[10px] font-bold text-center text-[#1a3a5a] group-hover:underline line-clamp-1">{m.name}</h3>
-                      <p className="text-[10px] text-[#d32f2f] font-bold">Rs. {m.price}</p>
-                    </a>
+                    <PhoneCard key={m.id} phone={m} />
                   ))}
                 </div>
               </section>
@@ -412,20 +402,9 @@ export function PhoneDetail() {
                     View All <ChevronRight className="h-3 w-3" />
                   </a>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                   {brandMobiles.map((m) => (
-                    <a key={m.id} href={`/phone/${m.slug}`} className="bg-white border rounded hover:shadow-md transition-shadow p-3 flex flex-col items-center group">
-                      <div className="aspect-[3/4] w-full relative mb-2 overflow-hidden">
-                        <img 
-                          src={m.images[0]} 
-                          alt={m.name} 
-                          className="object-contain w-full h-full group-hover:scale-105 transition-transform" 
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                      <h3 className="text-[10px] font-bold text-center text-[#1a3a5a] group-hover:underline line-clamp-1">{m.name}</h3>
-                      <p className="text-[10px] text-[#d32f2f] font-bold">Rs. {m.price}</p>
-                    </a>
+                    <PhoneCard key={m.id} phone={m} />
                   ))}
                 </div>
               </section>
