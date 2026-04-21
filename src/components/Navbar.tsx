@@ -30,19 +30,21 @@ export function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white border-b shadow-sm">
+    <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
-            <Smartphone className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-black tracking-tighter uppercase text-slate-800">MobiSpec<span className="text-muted-foreground text-sm lowercase">.com</span></span>
+          <a href="/" className="flex items-center gap-2 group">
+            <div className="bg-primary p-1.5 rounded-xl shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform duration-300">
+              <Smartphone className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-xl font-black tracking-tight text-slate-900">Mobi<span className="text-primary">Spec</span></span>
           </a>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6">
-            <a href="/" className="text-sm font-bold text-slate-700 hover:text-primary transition-colors">Home</a>
-            <a href="/news" className="text-sm font-bold text-slate-700 hover:text-primary transition-colors">News</a>
+          <div className="hidden md:flex items-center gap-8">
+            <a href="/" className="text-sm font-semibold text-slate-600 hover:text-primary transition-colors">Home</a>
+            <a href="/news" className="text-sm font-semibold text-slate-600 hover:text-primary transition-colors hover:translate-x-1 duration-200">Latest News</a>
           </div>
 
           {/* Actions */}
@@ -50,12 +52,12 @@ export function Navbar() {
             <div className="hidden sm:flex relative mr-2">
               <form onSubmit={handleSearch}>
                 <Input 
-                  placeholder="Search Mobile..." 
-                  className="w-48 lg:w-64 h-9 text-xs rounded-full bg-slate-100 border-transparent focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/20 transition-all font-medium"
+                  placeholder="Find your next model..." 
+                  className="w-48 lg:w-72 h-10 text-xs rounded-xl bg-slate-100 border-transparent focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/10 transition-all font-medium py-2"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <Button type="submit" size="icon" variant="ghost" className="absolute right-0 top-0 h-9 w-9 rounded-full text-muted-foreground">
+                <Button type="submit" size="icon" variant="ghost" className="absolute right-0 top-0 h-10 w-10 border-none rounded-xl text-muted-foreground hover:bg-transparent">
                   <Search className="h-4 w-4" />
                 </Button>
               </form>

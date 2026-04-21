@@ -18,7 +18,7 @@ export function SEO({
   schema 
 }: SEOProps) {
   const siteName = 'MobiSpec';
-  const fullTitle = `${title} | ${siteName}`;
+  const fullTitle = `${title || 'Mobile Specs'} | ${siteName}`;
 
   return (
     <Helmet>

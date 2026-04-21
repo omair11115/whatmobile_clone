@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, ChevronRight, Newspaper } from 'lucide-react';
+import { Star, ChevronRight, Newspaper, Smartphone, Clock } from 'lucide-react';
 import { Mobile, BlogPost } from '@/src/types';
 import { motion } from 'motion/react';
 import { useAuth } from '@/src/lib/auth';
@@ -93,105 +93,125 @@ export function PhoneDetail() {
   const renderSpecRow = (label: string, value: string | undefined) => {
     if (!value) return null;
     return (
-      <tr className="border-b last:border-0">
-        <th className="px-4 py-2 font-bold w-1/3 text-muted-foreground">{label}</th>
-        <td className="px-4 py-2">{value}</td>
+      <tr className="border-b border-slate-50 last:border-0 hover:bg-slate-50/30 transition-colors">
+        <th className="px-8 py-4 font-bold w-1/3 text-slate-400 uppercase tracking-widest text-[9px]">{label}</th>
+        <td className="px-8 py-4 text-slate-700 font-semibold">{value}</td>
       </tr>
     );
   };
 
   return (
-    <div className="min-h-screen bg-[#f0f2f5] pb-12">
+    <div className="min-h-screen bg-background pb-12">
       <SEO 
-        title={phone.seoTitle} 
-        description={phone.seoDescription}
+        title={phone.seoTitle || `${phone.name} Price in Pakistan & Specs`} 
+        description={phone.seoDescription || `Complete specifications and price of ${phone.name} in Pakistan. Filter by features, compare with other mobiles, and explore latest tech specs.`}
         ogImage={phone.images[0]}
         ogType="product"
         schema={productSchema}
       />
 
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-8">
         {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-[10px] font-bold text-[#1a3a5a] mb-6 uppercase">
-          <a href="/" className="hover:underline">Mobile Prices</a>
-          <span>{">"}</span>
-          <a href={`/brand/${phone.brand.toLowerCase()}`} className="hover:underline">{phone.brand} Mobiles</a>
-          <span>{">"}</span>
-          <span className="text-muted-foreground">{phone.name} Price in Pakistan</span>
+        <nav className="flex items-center gap-2 text-[10px] font-black text-muted-foreground mb-8 uppercase tracking-widest">
+          <a href="/" className="hover:text-primary transition-colors">Mobile Portal</a>
+          <ChevronRight className="h-2 w-2" />
+          <a href={`/brand/${phone.brand.toLowerCase()}`} className="hover:text-primary transition-colors">{phone.brand}</a>
+          <ChevronRight className="h-2 w-2" />
+          <span className="text-primary">{phone.name}</span>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-9 space-y-6">
+          <div className="lg:col-span-9 space-y-12">
 
             {/* Product Header Section */}
-            <div className="bg-white border rounded-lg shadow-sm overflow-hidden p-6">
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white border border-slate-100 rounded-[2.5rem] shadow-aesthetic overflow-hidden p-8"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
                 {/* Left: Image */}
-                <div className="md:col-span-4 flex flex-col items-center">
-                  <h1 className="text-2xl font-black text-[#1a3a5a] mb-2 text-center">{phone.name}</h1>
-                  <div className="mb-4">
+                <div className="md:col-span-5 flex flex-col items-center">
+                  <Badge className="bg-primary/5 text-primary border-none mb-4 font-black uppercase tracking-tighter transition-all hover:bg-primary/10 cursor-default">Official Review</Badge>
+                  <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-2 text-center tracking-tight leading-none">{phone.name}</h1>
+                  <div className="mb-6">
                     <StarRating mobileId={phone.id} />
                   </div>
-                  <div className="text-xs font-bold text-muted-foreground mb-4 text-center">
-                    Rs. {pkrPrice} <br />
-                    USD ${usdPrice}
-                  </div>
-                  <div className="aspect-[3/4] w-full relative mb-6">
+                  
+                  <div className="aspect-[3/4] w-full relative mb-8 group">
                     <img 
                       src={phone.images[0]} 
                       alt={phone.name} 
-                      className="object-contain w-full h-full"
+                      className="object-contain w-full h-full transform group-hover:scale-105 transition-transform duration-700"
                       referrerPolicy="no-referrer"
                     />
                   </div>
+
+                  <div className="bg-slate-50/50 rounded-2xl p-6 w-full text-center border border-slate-100">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Estimated Market Price</p>
+                    <p className="text-2xl font-black text-[#ef4444] leading-none mb-1">
+                      Rs. {pkrPrice}
+                    </p>
+                    <p className="text-sm font-bold text-slate-500">${usdPrice} USD</p>
+                  </div>
                 </div>
 
-                {/* Right: Social/Follow Box & Info */}
-                <div className="md:col-span-8 space-y-6">
-                  {/* Mock Social Box */}
-                  <div className="border rounded bg-[#f8f9fa] p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-[#1a3a5a] rounded flex items-center justify-center text-white font-black text-xs">WM</div>
-                      <div>
-                        <p className="text-sm font-bold text-[#1a3a5a]">WhatMobile<span className="text-[10px] font-normal">.com.pk</span></p>
-                        <p className="text-[10px] text-muted-foreground">1,066,776 followers</p>
-                      </div>
+                {/* Right: Info */}
+                <div className="md:col-span-7 space-y-8 py-4">
+                  <div className="bg-primary/5 rounded-3xl p-6 border border-primary/5 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                      <Smartphone className="h-24 w-24" />
                     </div>
-                    <Button size="sm" className="bg-[#4267B2] hover:bg-[#365899] text-white rounded-none text-[10px] h-7">Follow</Button>
+                    <h3 className="text-sm font-black text-primary uppercase tracking-widest mb-3">Market Position</h3>
+                    <p className="text-sm leading-relaxed text-slate-700 font-medium italic relative z-10">
+                      "{phone.description}"
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                       <Badge variant="outline" className="text-[10px] bg-white">4G LTE Supported</Badge>
+                       <Badge variant="outline" className="text-[10px] bg-white">Quick Charge</Badge>
+                       <Badge variant="outline" className="text-[10px] bg-white">Global Warranty</Badge>
+                    </div>
                   </div>
 
                   <div className="space-y-4">
-                    <div className="bg-[#f8f9fa] border-l-4 border-[#1a3a5a] p-3 text-xs leading-relaxed">
-                      <p className="font-bold text-[#1a3a5a] mb-1">{phone.name} price in Pakistan</p>
-                      <p>{phone.name} price in Pakistan is Rs. {pkrPrice}. Official dealers and warranty providers regulate the retail price of {phone.brand} mobile products in official warranty.</p>
-                      <ul className="mt-2 list-disc list-inside space-y-1">
-                        <li>Price of {phone.name} in Pakistan is Rs. {pkrPrice}.</li>
-                        <li>Price of {phone.brand} in USD is ${usdPrice}.</li>
-                      </ul>
+                    <div className="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
+                      <p className="text-xs font-bold text-slate-600 leading-relaxed">
+                        The current price of <span className="font-black text-primary">{phone.name}</span> in Pakistan is <span className="font-black text-[#ef4444]">Rs. {pkrPrice}</span>. 
+                        Price values are regulated by official dealers and warranty providers for <span className="font-black">{phone.brand}</span> mobile products.
+                      </p>
                     </div>
-
-                    <p className="text-xs leading-relaxed text-muted-foreground italic">
-                      {phone.description}
-                    </p>
                   </div>
 
+                  {/* Quick Specs Grid */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="border border-slate-100 rounded-2xl p-4 hover:shadow-aesthetic transition-all">
+                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Battery</h4>
+                      <p className="text-xs font-bold text-slate-700 line-clamp-1">{phone.specs?.battery?.capacity || 'Standard'}</p>
+                    </div>
+                    <div className="border border-slate-100 rounded-2xl p-4 hover:shadow-aesthetic transition-all">
+                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Display</h4>
+                      <p className="text-xs font-bold text-slate-700 line-clamp-1">{typeof phone.specs?.display === 'object' ? phone.specs.display.size : 'Standard'}</p>
+                    </div>
                   </div>
+
                 </div>
               </div>
+            </motion.div>
 
             {/* Detailed Specifications Table */}
-            <section className="bg-white border rounded-lg shadow-sm overflow-hidden">
-              <div className="bg-[#1a3a5a] text-white px-4 py-2 text-sm font-bold">
-                {phone.name} detailed specifications
+            <section className="bg-white border border-slate-100 rounded-[2.5rem] shadow-aesthetic overflow-hidden">
+              <div className="bg-slate-900 text-white px-8 py-5 flex items-center justify-between">
+                <h2 className="text-sm font-black uppercase tracking-widest">TECHNICAL SPECIFICATIONS</h2>
+                <Badge className="bg-white/10 text-white border-none text-[8px]">PRO SPECS</Badge>
               </div>
               <div className="p-0">
                 <table className="w-full text-left border-collapse text-xs">
                   <tbody>
                     {/* Build Section */}
                     {phone.specs?.build && (
-                      <tr className="bg-[#f8f9fa] border-b">
-                        <th className="px-4 py-3 font-bold text-[#1a3a5a] w-1/4 align-top">Build</th>
+                      <tr className="border-b border-slate-50">
+                        <th className="px-8 py-6 font-black text-slate-900 w-1/4 align-top uppercase tracking-tighter text-[11px]">Build</th>
                         <td className="p-0 w-3/4">
                           <table className="w-full border-collapse">
                             <tbody>
@@ -368,24 +388,31 @@ export function PhoneDetail() {
               </div>
             </section>
 
-            {/* Disclaimer */}
-            <div className="bg-white border rounded-lg p-4 text-[10px] text-muted-foreground leading-relaxed">
-              <p className="font-bold mb-2">Disclaimer.</p>
-              <p>{phone.brand} {phone.name} price in Pakistan is updated daily from the price list provided by local shops and dealers but we can not guarantee that the information / price / {phone.name} Prices on this page is 100% correct (Human error is possible), always visit your local shop for exact cell phone cost & rate. {phone.brand} {phone.name} price Pakistan.</p>
+            {/* Discussion Section */}
+            <div className="bg-white border border-slate-100 rounded-3xl p-8 shadow-aesthetic">
+              <div className="flex items-center gap-2 mb-6">
+                <Star className="h-5 w-5 text-primary fill-primary" />
+                <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase">User Discussions</h2>
+              </div>
+              <CommentSection mobileId={phone.id} currentUser={user} />
             </div>
 
-            {/* Discussion Section */}
-            <div className="bg-white border rounded-lg p-6 shadow-sm">
-              <CommentSection mobileId={phone.id} currentUser={user} />
+            {/* Disclaimer */}
+            <div className="bg-slate-50 border border-slate-100 rounded-3xl p-8 text-[10px] text-slate-400 leading-relaxed">
+              <p className="font-black text-slate-500 uppercase tracking-widest mb-3">Disclaimer & Verification</p>
+              <p className="font-medium italic">{phone.brand} {phone.name} specifications and prices in Pakistan are gathered from reputable local retailers and official brand documentations. While we strive for absolute accuracy, market variations and human data entry are possible. We recommend verifying the final price with your nearest authorized dealership. MobiSpec is not liable for price discrepancies at the time of purchase.</p>
             </div>
 
             {/* Similar Phones Section */}
             {similarMobiles.length > 0 && (
-              <section className="space-y-4">
-                <div className="flex items-center justify-between border-b pb-2">
-                  <h2 className="text-lg font-black text-[#1a3a5a] uppercase">Similar Phones</h2>
+              <section className="space-y-6 pt-8">
+                <div className="flex items-end justify-between px-2">
+                  <div>
+                    <h2 className="text-xl font-black text-slate-900 tracking-tight leading-none uppercase">SIMILAR MODELS</h2>
+                    <p className="text-[10px] text-muted-foreground mt-1 font-bold uppercase tracking-wider">Comparable Specs & Price</p>
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {similarMobiles.map((m) => (
                     <PhoneCard key={m.id} phone={m} />
                   ))}
@@ -395,14 +422,17 @@ export function PhoneDetail() {
 
             {/* More From Brand Section */}
             {brandMobiles.length > 0 && (
-              <section className="space-y-4">
-                <div className="flex items-center justify-between border-b pb-2">
-                  <h2 className="text-lg font-black text-[#1a3a5a] uppercase">More {phone.brand} Mobiles</h2>
-                  <a href={`/brand/${phone.brand.toLowerCase()}`} className="text-[10px] font-bold text-[#1a3a5a] hover:underline flex items-center">
-                    View All <ChevronRight className="h-3 w-3" />
+              <section className="space-y-6">
+                <div className="flex items-end justify-between px-2">
+                  <div>
+                    <h2 className="text-xl font-black text-slate-900 tracking-tight leading-none uppercase">MORE FROM {phone.brand}</h2>
+                    <p className="text-[10px] text-muted-foreground mt-1 font-bold uppercase tracking-wider">Explore the ecosystem</p>
+                  </div>
+                  <a href={`/brand/${phone.brand.toLowerCase()}`} className="text-[10px] font-black text-primary hover:underline flex items-center group uppercase tracking-widest">
+                    View Catalog <ChevronRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
                   </a>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {brandMobiles.map((m) => (
                     <PhoneCard key={m.id} phone={m} />
                   ))}
@@ -412,24 +442,28 @@ export function PhoneDetail() {
 
             {/* Brand News Section */}
             {brandNews.length > 0 && (
-              <section className="space-y-4">
-                <div className="flex items-center justify-between border-b pb-2">
-                  <h2 className="text-lg font-black text-[#1a3a5a] uppercase">{phone.brand} Latest News</h2>
+              <section className="space-y-6">
+                <div className="flex items-center gap-2 px-2">
+                  <Newspaper className="h-5 w-5 text-primary" />
+                  <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase">Tech Insights</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {brandNews.map((post) => (
-                    <a key={post.id} href={`/blog/${post.slug}`} className="bg-white border rounded overflow-hidden flex gap-3 p-3 hover:shadow-md transition-shadow group">
-                      <div className="w-24 h-24 flex-shrink-0 bg-muted rounded overflow-hidden">
+                    <a key={post.id} href={`/blog/${post.slug}`} className="bg-white border border-slate-100 rounded-3xl overflow-hidden flex flex-col sm:flex-row gap-4 p-4 hover:shadow-aesthetic transition-all group">
+                      <div className="w-full sm:w-32 h-32 flex-shrink-0 bg-slate-50 rounded-2xl overflow-hidden">
                         <img 
                           src={post.image} 
                           alt={post.title} 
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           referrerPolicy="no-referrer"
                         />
                       </div>
                       <div className="flex flex-col justify-center">
-                        <h3 className="text-[11px] font-bold text-[#1a3a5a] line-clamp-2 leading-tight group-hover:underline">{post.title}</h3>
-                        <p className="text-[9px] text-muted-foreground mt-1">{new Date(post.created_at).toLocaleDateString()}</p>
+                        <h3 className="text-sm font-black text-slate-800 line-clamp-3 leading-tight group-hover:text-primary transition-colors">{post.title}</h3>
+                        <div className="flex items-center gap-2 mt-3">
+                          <Badge variant="secondary" className="text-[8px] bg-slate-100 text-slate-500 border-none font-black uppercase">Editorial</Badge>
+                          <p className="text-[10px] text-slate-400 font-bold">{new Date(post.created_at).toLocaleDateString()}</p>
+                        </div>
                       </div>
                     </a>
                   ))}
