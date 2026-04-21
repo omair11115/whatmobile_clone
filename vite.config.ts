@@ -16,25 +16,6 @@ export default defineConfig(({mode}) => {
       },
     },
     server: {
-      port: 3001,
-      proxy: {
-        '/api': {
-          target: 'http://localhost:3000',
-          changeOrigin: true,
-        },
-        '/auth': {
-          target: 'http://localhost:3000',
-          changeOrigin: true,
-        },
-        '/sitemap.xml': {
-          target: 'http://localhost:3000',
-          changeOrigin: true,
-        },
-        '/uploads': {
-          target: 'http://localhost:3000',
-          changeOrigin: true,
-        },
-      },
       allowedHosts: [
         'elsy-hydromedusan-margery.ngrok-free.dev',
         'localhost',

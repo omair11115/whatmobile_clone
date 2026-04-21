@@ -1,6 +1,5 @@
 import "dotenv/config";
 import express from "express";
-import cors from "cors";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -65,10 +64,6 @@ async function startServer() {
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
   app.use(cookieParser());
-  app.use(cors({
-    origin: ["http://localhost:3001"],
-    credentials: true,
-  }));
 
   // Global API Logger
   app.use("/api", (req, res, next) => {
@@ -1573,16 +1568,14 @@ async function startServer() {
   });
 
   // Vite middleware for development
-  // Only use if not running as a separate project (standalone backend mode)
-  if (process.env.NODE_ENV !== "production" && process.env.STANDALONE_BACKEND !== "true") {
+  if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
-      root: path.resolve(__dirname, '..', 'frontend'),
       server: { middlewareMode: true },
       appType: "spa",
     });
     app.use(vite.middlewares);
-  } else if (process.env.NODE_ENV === "production") {
-    const distPath = path.resolve(__dirname, '..', 'frontend', 'dist');
+  } else {
+    const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));

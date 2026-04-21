@@ -1,17 +1,17 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { Home } from '@/pages/Home';
-import { PhoneDetail } from '@/pages/PhoneDetail';
-import { Admin } from '@/pages/Admin';
-import { Search } from '@/pages/Search';
-import { CategoryPage } from '@/pages/CategoryPage';
-import { BlogDetail } from '@/pages/BlogDetail';
-import Contact from '@/pages/Contact';
-import { PrivacyPolicy } from '@/pages/PrivacyPolicy';
-import { TermsOfService } from '@/pages/TermsOfService';
-import { AuthProvider } from '@/lib/auth';
+import { Navbar } from '@/src/components/Navbar';
+import { Footer } from '@/src/components/Footer';
+import { Home } from '@/src/pages/Home';
+import { PhoneDetail } from '@/src/pages/PhoneDetail';
+import { Admin } from '@/src/pages/Admin';
+import { Search } from '@/src/pages/Search';
+import { CategoryPage } from '@/src/pages/CategoryPage';
+import { BlogDetail } from '@/src/pages/BlogDetail';
+import Contact from '@/src/pages/Contact';
+import { PrivacyPolicy } from '@/src/pages/PrivacyPolicy';
+import { TermsOfService } from '@/src/pages/TermsOfService';
+import { AuthProvider } from '@/src/lib/auth';
 
 export default function App() {
   return (
