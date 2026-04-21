@@ -13,11 +13,11 @@ export function PhoneCard({ phone }: PhoneCardProps) {
   return (
     <a href={`/phone/${phone.slug}`} className="block group">
       <div className="bg-white border rounded p-2 flex flex-col items-center text-center hover:shadow-md transition-shadow h-full">
-        <div className="w-full h-[180px] relative mb-2 flex items-center justify-center p-1">
+        <div className="w-full h-[160px] relative mb-2 flex items-center justify-center overflow-hidden">
           <img 
             src={phone.images[0] || 'https://picsum.photos/seed/phone/200/300'} 
             alt={phone.name}
-            className="w-full h-full object-contain"
+            className="max-h-full w-auto object-contain"
             referrerPolicy="no-referrer"
           />
         </div>
