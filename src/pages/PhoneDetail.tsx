@@ -137,7 +137,7 @@ export function PhoneDetail() {
                     Rs. {pkrPrice} <br />
                     USD ${usdPrice}
                   </div>
-                  <div className="aspect-[3/4] w-full relative mb-6">
+                  <div className="aspect-[2/3] w-full relative mb-6">
                     <img 
                       src={phone.images[0]} 
                       alt={phone.name} 

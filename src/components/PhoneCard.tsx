@@ -1,7 +1,4 @@
 import { Mobile } from '@/src/types';
-import { Card } from '@/components/ui/card';
-
-import { motion } from 'motion/react';
 
 interface PhoneCardProps {
   phone: Mobile;
@@ -15,23 +12,23 @@ export function PhoneCard({ phone }: PhoneCardProps) {
 
   return (
     <a href={`/phone/${phone.slug}`} className="block group">
-      <div className="bg-white border rounded p-2 flex flex-col items-center text-center hover:shadow-md transition-shadow">
-        <div className="w-full aspect-[3/4] relative mb-2 flex items-center justify-center p-1">
+      <div className="bg-white border rounded p-2 flex flex-col items-center text-center hover:shadow-md transition-shadow h-full">
+        <div className="w-full h-[180px] relative mb-2 flex items-center justify-center p-1">
           <img 
             src={phone.images[0] || 'https://picsum.photos/seed/phone/200/300'} 
             alt={phone.name}
-            className="object-contain w-full h-full"
+            className="w-full h-full object-contain"
             referrerPolicy="no-referrer"
           />
         </div>
-        <div className="space-y-0.5">
-          <p className="text-[12px] font-bold text-[#1a3a5a] group-hover:text-primary line-clamp-2 leading-tight min-h-[20px]">
+        <div className="space-y-0.5 w-full">
+          <p className="text-[12px] font-bold text-[#1a3a5a] group-hover:text-primary line-clamp-1 truncate uppercase">
             {brand}
           </p>
-          <h3 className="text-[12px] font-bold text-[#1a3a5a] line-clamp-2 leading-tight min-h-[30px] group-hover:text-primary transition-colors">
+          <h3 className="text-[12px] font-bold text-[#1a3a5a] line-clamp-2 leading-tight min-h-[30px] group-hover:text-primary transition-colors px-1">
             {model}
           </h3>
-          <p className="text-[#d32f2f] font-bold text-xs">
+          <p className="text-[#d32f2f] font-bold text-xs mt-1">
             {phone.currency} {phone.price.toLocaleString()}
           </p>
         </div>
