@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PhoneCard } from '@/src/components/PhoneCard';
-import { BlogCard } from '@/src/components/BlogCard';
-import { BrandGrid } from '@/src/components/BrandGrid';
-import { Sidebar } from '@/src/components/Sidebar';
-import { SEO } from '@/src/components/SEO';
+import { PhoneCard } from '@/components/PhoneCard';
+import { BlogCard } from '@/components/BlogCard';
+import { BrandGrid } from '@/components/BrandGrid';
+import { Sidebar } from '@/components/Sidebar';
+import { SEO } from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronRight, Zap, Star, Clock, Smartphone, Newspaper } from 'lucide-react';
 import { motion } from 'motion/react';
-import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption } from '@/src/types';
-import { BRANDS } from '@/src/constants';
+import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption } from '@/types';
+import { BRANDS } from '@/constants';
 
 // Removed Mock Data Constants
 
