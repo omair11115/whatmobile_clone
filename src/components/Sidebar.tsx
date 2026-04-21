@@ -59,80 +59,72 @@ export function Sidebar({ showPriceFilters = true, showFeatureFilters = true }: 
   }
 
   return (
-    <aside className="space-y-6">
+    <aside className="space-y-4">
       {/* Search by Brand */}
-      <section className="bg-white border border-slate-100 rounded-2xl shadow-aesthetic overflow-hidden transition-all duration-300">
-        <div className="bg-slate-50/80 px-4 py-3 border-b border-slate-100 flex items-center gap-2">
-          <Smartphone className="h-4 w-4 text-primary" />
-          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-widest">Phone Brands</h3>
+      <section className="bg-white border rounded shadow-sm overflow-hidden">
+        <div className="bg-[#1a3a5a] px-3 py-2 border-b">
+          <h3 className="text-xs font-bold text-white uppercase tracking-tight">Search by Brand</h3>
         </div>
-        <div className="p-2 grid grid-cols-1 gap-1">
+        <div className="p-1 grid grid-cols-1 gap-0.5">
           {brands.length > 0 ? brands.map(brand => (
-            <a key={brand.id} href={`/brand/${brand.slug}`} className="px-3 py-2 text-[11px] font-semibold text-slate-600 hover:text-primary hover:bg-slate-50 rounded-lg transition-all flex justify-between items-center group">
+            <a key={brand.id} href={`/brand/${brand.slug}`} className="px-3 py-1 text-xs text-[#1a3a5a] hover:bg-muted transition-colors flex justify-between items-center group">
               <span>{brand.name}</span>
-              <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+              <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
             </a>
           )) : (
-            <div className="px-3 py-4 text-center text-[10px] text-muted-foreground italic">No brands found.</div>
+            <div className="px-3 py-2 text-center text-[10px] text-muted-foreground italic">No brands found.</div>
           )}
         </div>
       </section>
 
       {/* Search by Price */}
       {showPriceFilters && priceRanges.length > 0 && (
-        <section className="bg-white border border-slate-100 rounded-2xl shadow-aesthetic overflow-hidden transition-all duration-300">
-          <div className="bg-slate-50/80 px-4 py-3 border-b border-slate-100 flex items-center gap-2">
-            <Zap className="h-4 w-4 text-primary" />
-            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-widest">Price Range</h3>
+        <section className="bg-white border rounded shadow-sm overflow-hidden">
+          <div className="bg-[#1a3a5a] px-3 py-2 border-b">
+            <h3 className="text-xs font-bold text-white uppercase tracking-tight">Search by Price</h3>
           </div>
-          <div className="p-2 grid grid-cols-1 gap-1 font-semibold">
+          <div className="p-1 grid grid-cols-1 gap-0.5">
             {priceRanges.map(range => (
-              <a key={range.id} href={`/price-range?min=${range.minPrice}&max=${range.maxPrice}&label=${encodeURIComponent(range.label)}`} className="px-3 py-2 text-[11px] text-slate-600 hover:text-primary hover:bg-slate-50 rounded-lg transition-all group flex justify-between items-center">
+              <a key={range.id} href={`/price-range?min=${range.minPrice}&max=${range.maxPrice}&label=${encodeURIComponent(range.label)}`} className="px-3 py-1 text-xs text-[#1a3a5a] hover:bg-muted transition-colors group flex justify-between items-center">
                 <span>{range.label}</span>
-                <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
               </a>
             ))}
           </div>
         </section>
       )}
 
-      {/* Other Filters (Consolidated for cleaner sidebar) */}
-      <section className="bg-white border border-slate-100 rounded-2xl shadow-aesthetic overflow-hidden transition-all duration-300">
-        <div className="bg-slate-50/80 px-4 py-3 border-b border-slate-100 flex items-center gap-2">
-          <Filter className="h-4 w-4 text-primary" />
-          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-widest">Specific Filters</h3>
-        </div>
-        <div className="p-2 space-y-1">
-          {networks.length > 0 && (
-            <div className="pb-2">
-              <p className="px-3 py-1 text-[10px] font-black text-muted-foreground uppercase tracking-tighter flex items-center gap-1">
-                <Wifi className="h-3 w-3" /> Network
-              </p>
-              <div className="grid grid-cols-1 gap-0.5">
-                {networks.map(n => (
-                  <a key={n.id} href={`/network/${n.slug}`} className="px-3 py-1.5 text-[11px] font-semibold text-slate-600 hover:text-primary hover:bg-slate-50 rounded-lg transition-all block">
-                    {n.name}
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-          {ramOptions.length > 0 && (
-            <div className="pb-2">
-              <p className="px-3 py-1 text-[10px] font-black text-muted-foreground uppercase tracking-tighter flex items-center gap-1">
-                <Cpu className="h-3 w-3" /> RAM
-              </p>
-              <div className="grid grid-cols-1 gap-0.5">
-                {ramOptions.map(r => (
-                  <a key={r.id} href={`/ram/${r.slug}`} className="px-3 py-1.5 text-[11px] font-semibold text-slate-600 hover:text-primary hover:bg-slate-50 rounded-lg transition-all block">
-                    {r.label}
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
+      {/* Network Filters */}
+      {networks.length > 0 && (
+        <section className="bg-white border rounded shadow-sm overflow-hidden">
+          <div className="bg-[#1a3a5a] px-3 py-2 border-b">
+            <h3 className="text-xs font-bold text-white uppercase tracking-tight">Search by Network</h3>
+          </div>
+          <div className="p-1 grid grid-cols-1 gap-0.5">
+            {networks.map(n => (
+              <a key={n.id} href={`/network/${n.slug}`} className="px-3 py-1 text-xs text-[#1a3a5a] hover:bg-muted transition-colors block">
+                {n.name}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* RAM Filters */}
+      {ramOptions.length > 0 && (
+        <section className="bg-white border rounded shadow-sm overflow-hidden">
+          <div className="bg-[#1a3a5a] px-3 py-2 border-b">
+            <h3 className="text-xs font-bold text-white uppercase tracking-tight">Search by RAM</h3>
+          </div>
+          <div className="p-1 grid grid-cols-1 gap-0.5">
+            {ramOptions.map(r => (
+              <a key={r.id} href={`/ram/${r.slug}`} className="px-3 py-1 text-xs text-[#1a3a5a] hover:bg-muted transition-colors block">
+                {r.label}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
     </aside>
   );
 }
