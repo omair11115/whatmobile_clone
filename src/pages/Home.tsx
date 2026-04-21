@@ -8,11 +8,18 @@ import { SEO } from '@/src/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronRight, Zap, Star, Clock, Smartphone, Newspaper } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption } from '@/src/types';
 import { BRANDS } from '@/src/constants';
 
 // Removed Mock Data Constants
+
+const HERO_IMAGES = [
+  'https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=1200&h=400&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1200&h=400&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?q=80&w=1200&h=400&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1556656793-062ff98782ea?q=80&w=1200&h=400&auto=format&fit=crop'
+];
 
 export function Home() {
   const navigate = useNavigate();
@@ -26,6 +33,14 @@ export function Home() {
   const [osOptions, setOsOptions] = useState<OsOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     Promise.all([
@@ -106,10 +121,57 @@ export function Home() {
           {/* Main Content */}
           <div className="lg:col-span-9 space-y-6">
             
-            {/* Ad Banner or Promo */}
-            <div className="bg-[#1a3a5a] text-white p-6 rounded shadow-sm text-center">
-              <h1 className="text-xl font-bold uppercase tracking-tight">Mobile Phone Prices in Pakistan</h1>
-              <p className="text-[10px] mt-1 font-medium uppercase tracking-widest text-slate-300">Find latest mobile prices, specs and comparisons</p>
+            {/* Hero Slider */}
+            <div className="relative h-[250px] sm:h-[400px] rounded overflow-hidden shadow-sm group">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentSlide}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="absolute inset-0"
+                >
+                  <img 
+                    src={HERO_IMAGES[currentSlide]} 
+                    alt={`Slide ${currentSlide + 1}`} 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30 flex flex-col items-center justify-center text-center p-6">
+                    <motion.h1 
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="text-2xl sm:text-4xl font-bold uppercase tracking-tight text-white drop-shadow-md"
+                    >
+                      Mobile Phone Prices in Pakistan
+                    </motion.h1>
+                    <motion.p 
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                      className="text-[10px] sm:text-xs mt-4 font-medium uppercase tracking-[0.2em] text-slate-100 max-w-md drop-shadow-sm"
+                    >
+                      Find latest mobile prices, specs and comparisons
+                    </motion.p>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+              
+              {/* Slider Dots */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-3 z-10">
+                {HERO_IMAGES.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentSlide(i)}
+                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                      currentSlide === i ? 'bg-white scale-125 border-2 border-white/20' : 'bg-white/40 hover:bg-white/60'
+                    }`}
+                    aria-label={`Go to slide ${i + 1}`}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Latest Mobile Phones Section */}
