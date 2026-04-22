@@ -89,17 +89,22 @@ export function Home() {
   
   const pkr40kTo50k = displayPhones.filter(p => {
     const price = parseInt(p.price.toString().replace(/,/g, ''));
-    return price <= 50000 && price > 40000;
+    return price <= 50000 && price >= 40000;
   });
 
   const pkr30kTo40k = displayPhones.filter(p => {
     const price = parseInt(p.price.toString().replace(/,/g, ''));
-    return price <= 40000 && price > 30000;
+    return price < 40000 && price >= 30000;
   });
 
   const pkr20kTo30k = displayPhones.filter(p => {
     const price = parseInt(p.price.toString().replace(/,/g, ''));
-    return price <= 30000 && price > 20000;
+    return price < 30000 && price > 20000;
+  });
+
+  const pkr10kTo20k = displayPhones.filter(p => {
+    const price = parseInt(p.price.toString().replace(/,/g, ''));
+    return price <= 20000 && price > 10000;
   });
 
   const pkrUnder10k = displayPhones.filter(p => {
@@ -212,6 +217,58 @@ export function Home() {
               </div>
               <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
                 {pkr40kTo50k.slice(0, 6).map(phone => (
+                  <PhoneCard key={phone.id} phone={phone} />
+                ))}
+              </div>
+            </section>
+
+            {/* Price Row 3: 30k - 40k */}
+            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices 30,000 - 40,000 Rs.</h2>
+                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {pkr30kTo40k.slice(0, 6).map(phone => (
+                  <PhoneCard key={phone.id} phone={phone} />
+                ))}
+              </div>
+            </section>
+
+            {/* Price Row 4: 20k - 30k */}
+            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices 20,001 - 30,000 Rs.</h2>
+                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {pkr20kTo30k.slice(0, 6).map(phone => (
+                  <PhoneCard key={phone.id} phone={phone} />
+                ))}
+              </div>
+            </section>
+
+            {/* Price Row 5: 10k - 20k */}
+            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices 10,001 - 20,000 Rs.</h2>
+                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {pkr10kTo20k.slice(0, 6).map(phone => (
+                  <PhoneCard key={phone.id} phone={phone} />
+                ))}
+              </div>
+            </section>
+
+            {/* Price Row 6: Under 10k */}
+            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices under 10,000 in Pakistan</h2>
+                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {pkrUnder10k.slice(0, 6).map(phone => (
                   <PhoneCard key={phone.id} phone={phone} />
                 ))}
               </div>
