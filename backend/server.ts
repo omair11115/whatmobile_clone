@@ -1,6 +1,6 @@
 import "dotenv/config";
 import express from "express";
-import { createServer as createViteServer } from "vite";
+import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import pool from './db';
@@ -53,7 +53,13 @@ async function fixExistingSlugs() {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.BACKEND_PORT || 3001;
+
+  // Use CORS
+  app.use(cors({
+    origin: [process.env.FRONTEND_URL || 'http://localhost:3000', 'http://localhost:3000'],
+    credentials: true
+  }));
 
   // Trust proxy for ngrok and load balancers
   app.set('trust proxy', 1);
@@ -881,7 +887,7 @@ async function startServer() {
           }
         }
       });
-      res.json(JSON.parse(result.text));
+      res.json(JSON.parse(result.text || '[]'));
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
@@ -928,7 +934,7 @@ async function startServer() {
           }
         }
       });
-      res.json(JSON.parse(result.text));
+      res.json(JSON.parse(result.text || '{}'));
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
@@ -1567,23 +1573,8 @@ async function startServer() {
     res.status(404).json({ error: `API route ${req.method} ${req.originalUrl} not found` });
   });
 
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-  }
-
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  app.listen(Number(PORT), "0.0.0.0", () => {
+    console.log(`Backend server running on http://localhost:${PORT}`);
   });
 }
 
