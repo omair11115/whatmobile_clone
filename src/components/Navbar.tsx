@@ -4,7 +4,7 @@ import { Search, Menu, X, Smartphone, Newspaper, Moon, Sun, LogOut, User as User
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/src/lib/auth';
 import {
   DropdownMenu,
   DropdownMenuContent,

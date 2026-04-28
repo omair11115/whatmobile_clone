@@ -1,0 +1,194 @@
+export interface MobileSpec {
+  build: {
+    os: string;
+    ui: string;
+    dimensions: string;
+    weight: string;
+    sim: string;
+    colors: string;
+  };
+  frequency: {
+    '2g': string;
+    '3g': string;
+    '4g': string;
+    '5g'?: string;
+  };
+  processor: {
+    cpu: string;
+    chipset: string;
+    gpu: string;
+  };
+  display: {
+    technology: string;
+    size: string;
+    resolution: string;
+    protection: string;
+    extra: string;
+  };
+  memory: {
+    builtin: string;
+    card: string;
+  };
+  camera: {
+    main: string;
+    features: string;
+    front: string;
+  };
+  connectivity: {
+    wlan: string;
+    bluetooth: string;
+    gps: string;
+    radio: string;
+    usb: string;
+    nfc: string;
+    infrared: string;
+    data: string;
+  };
+  features: {
+    sensors: string;
+    audio: string;
+    browser: string;
+    messaging: string;
+    games: string;
+    torch: string;
+    extra: string;
+  };
+  battery: {
+    capacity: string;
+    extra: string;
+  };
+  price: {
+    pkr: string;
+    usd: string;
+  };
+}
+
+export interface Mobile {
+  id: string;
+  name: string;
+  brand: string;
+  slug: string;
+  price: number | string;
+  currency: string;
+  launchDate: string;
+  images: string[];
+  specs: MobileSpec;
+  description: string;
+  seoTitle: string;
+  seoDescription: string;
+  category: 'budget' | 'mid-range' | 'flagship';
+  features: string[];
+  comingSoon?: boolean;
+  status: ContentStatus;
+  created_at: string;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  author: string;
+  image: string;
+  tags: string[];
+  brand?: string;
+  brand_id?: string;
+  seoTitle: string;
+  seoDescription: string;
+  status: ContentStatus;
+  created_at: string;
+}
+
+export interface Brand {
+  id: string;
+  name: string;
+  slug: string;
+  logo?: string;
+  description?: string;
+  status: ContentStatus;
+}
+
+export interface PriceRange {
+  id: string;
+  label: string;
+  minPrice: number;
+  maxPrice: number;
+  currency: string;
+}
+
+export interface Network {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface RamOption {
+  id: string;
+  label: string;
+  slug: string;
+}
+
+export interface ScreenSize {
+  id: string;
+  label: string;
+  slug: string;
+}
+
+export interface MobileFeature {
+  id: string;
+  label: string;
+  slug: string;
+}
+
+export interface OsOption {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface GalleryImage {
+  id: string;
+  url: string;
+  fileName: string;
+  mimeType: string;
+  size: number;
+  description?: string;
+  altText?: string;
+  created_at: string;
+}
+
+export enum UserRole {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  MANAGER = 'MANAGER',
+  USER = 'USER'
+}
+
+export type ContentStatus = 'published' | 'pending';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  role: UserRole;
+}
+
+export interface Comment {
+  id: string;
+  mobile_id?: string;
+  post_id?: string;
+  user_id: string;
+  content: string;
+  parent_id?: string;
+  created_at: string;
+  user?: User;
+  replies?: Comment[];
+}
+
+export interface Rating {
+  id: string;
+  mobile_id: string;
+  user_id: string;
+  rating: number;
+  created_at: string;
+}

@@ -7,8 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Smartphone, FileText, Settings, Image as ImageIcon, Copy, Check, Search, Type, CheckCircle, Zap, RefreshCw, Plus, Edit2, Trash2, LogOut } from 'lucide-react';
-import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption, GalleryImage, UserRole, ContentStatus } from '@/types';
-import { useAuth } from '@/lib/auth';
+import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption, GalleryImage, UserRole, ContentStatus } from '@/src/types';
+import { useAuth } from '@/src/lib/auth';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 
@@ -121,16 +121,16 @@ export function Admin() {
   const fetchData = async () => {
     try {
       const endpoints = [
-        '/api/mobiles/admin',
-        '/api/posts/admin',
-        '/api/brands',
-        '/api/price-ranges',
-        '/api/networks',
-        '/api/ram-options',
-        '/api/screen-sizes',
-        '/api/mobile-features',
-        '/api/os-options',
-        '/api/images'
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles/admin`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/posts/admin`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/brands`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/price-ranges`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/networks`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/ram-options`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/screen-sizes`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/mobile-features`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/os-options`,
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/images`
       ];
       
       const responses = await Promise.all(endpoints.map(url => fetch(url)));
@@ -155,7 +155,7 @@ export function Admin() {
 
   const handleApprove = async (type: 'mobiles' | 'posts', id: string) => {
     try {
-      const res = await fetch(`/api/${type}/${id}/approve`, { method: 'POST' });
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/${type}/${id}/approve`, { method: 'POST' });
       if (res.ok) {
         fetchData();
       } else {
@@ -208,7 +208,7 @@ export function Admin() {
     formData.append('altText', imageForm.altText);
 
     try {
-      const res = await fetch('/api/images', {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/images`, {
         method: 'POST',
         body: formData,
       });
@@ -233,7 +233,7 @@ export function Admin() {
   const handleDeleteImage = async (id: string) => {
     if (!confirm("Are you sure you want to delete this image?")) return;
     try {
-      const res = await fetch(`/api/images/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/images/${id}`, { method: 'DELETE' });
       if (res.ok) fetchData();
     } catch (err) {
       console.error(err);
@@ -259,7 +259,7 @@ export function Admin() {
 
     try {
       addLog("Fetching latest mobile launches from AI source...");
-      const launchesRes = await fetch('/api/ai/latest-launches');
+      const launchesRes = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/ai/latest-launches`);
       const launches = await launchesRes.json();
       
       if (!Array.isArray(launches)) throw new Error("Failed to fetch launches");
@@ -268,7 +268,7 @@ export function Admin() {
 
       for (const mobile of launches) {
         addLog(`Generating detailed content for ${mobile}...`);
-        const genRes = await fetch('/api/ai/generate-post', {
+        const genRes = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/ai/generate-post`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ mobileName: mobile })
@@ -278,7 +278,7 @@ export function Admin() {
         if (data && !data.error) {
           addLog(`Successfully generated content for ${mobile}. Slug: ${data.slug}`);
           addLog(`Saving ${mobile} to database...`);
-          const response = await fetch('/api/mobiles', {
+          const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -318,7 +318,7 @@ export function Admin() {
   const handleDeleteMobile = async (id: string) => {
     if (!confirm("Are you sure you want to delete this mobile?")) return;
     try {
-      const res = await fetch(`/api/mobiles/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setMobiles(prev => prev.filter(m => m.id !== id));
       }
@@ -330,7 +330,7 @@ export function Admin() {
   const handleDeletePost = async (id: string) => {
     if (!confirm("Are you sure you want to delete this post?")) return;
     try {
-      const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/posts/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setPosts(prev => prev.filter(p => p.id !== id));
       }
@@ -343,7 +343,7 @@ export function Admin() {
     e.preventDefault();
     if (!editingBrand) return;
     const isNew = !editingBrand.id;
-    const url = isNew ? '/api/brands' : `/api/brands/${editingBrand.id}`;
+    const url = isNew ? `${import.meta.env.VITE_BACKEND_API_URL}/api/brands` : `${import.meta.env.VITE_BACKEND_API_URL}/api/brands/${editingBrand.id}`;
     const method = isNew ? 'POST' : 'PUT';
     try {
       const res = await fetch(url, {
@@ -363,7 +363,7 @@ export function Admin() {
   const handleDeleteBrand = async (id: string) => {
     if (!confirm("Delete this brand?")) return;
     try {
-      await fetch(`/api/brands/${id}`, { method: 'DELETE' });
+      await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/brands/${id}`, { method: 'DELETE' });
       fetchData();
     } catch (err) {
       console.error(err);
@@ -374,7 +374,7 @@ export function Admin() {
     e.preventDefault();
     if (!editingPriceRange) return;
     const isNew = !editingPriceRange.id;
-    const url = isNew ? '/api/price-ranges' : `/api/price-ranges/${editingPriceRange.id}`;
+    const url = isNew ? `${import.meta.env.VITE_BACKEND_API_URL}/api/price-ranges` : `${import.meta.env.VITE_BACKEND_API_URL}/api/price-ranges/${editingPriceRange.id}`;
     const method = isNew ? 'POST' : 'PUT';
     try {
       const res = await fetch(url, {
@@ -394,7 +394,7 @@ export function Admin() {
   const handleDeletePriceRange = async (id: string) => {
     if (!confirm("Delete this price range?")) return;
     try {
-      await fetch(`/api/price-ranges/${id}`, { method: 'DELETE' });
+      await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/price-ranges/${id}`, { method: 'DELETE' });
       fetchData();
     } catch (err) {
       console.error(err);
@@ -403,7 +403,7 @@ export function Admin() {
 
   const handleSaveAttribute = async (type: string, data: any, setEditing: (val: any) => void) => {
     const isNew = !data.id;
-    const url = isNew ? `/api/${type}` : `/api/${type}/${data.id}`;
+    const url = isNew ? `${import.meta.env.VITE_BACKEND_API_URL}/api/${type}` : `${import.meta.env.VITE_BACKEND_API_URL}/api/${type}/${data.id}`;
     const method = isNew ? 'POST' : 'PUT';
     try {
       const res = await fetch(url, {
@@ -423,7 +423,7 @@ export function Admin() {
   const handleDeleteAttribute = async (type: string, id: string) => {
     if (!confirm(`Delete this ${type}?`)) return;
     try {
-      await fetch(`/api/${type}/${id}`, { method: 'DELETE' });
+      await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/${type}/${id}`, { method: 'DELETE' });
       fetchData();
     } catch (err) {
       console.error(err);
@@ -434,7 +434,7 @@ export function Admin() {
     e.preventDefault();
     if (!editingMobile) return;
     const isNew = !editingMobile.id;
-    const url = isNew ? '/api/mobiles' : `/api/mobiles/${editingMobile.id}`;
+    const url = isNew ? `${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles` : `${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles/${editingMobile.id}`;
     const method = isNew ? 'POST' : 'PUT';
 
     // Ensure all fields have at least default values to avoid backend errors
@@ -473,7 +473,7 @@ export function Admin() {
     e.preventDefault();
     if (!editingPost) return;
     const isNew = !editingPost.id;
-    const url = isNew ? '/api/posts' : `/api/posts/${editingPost.id}`;
+    const url = isNew ? `${import.meta.env.VITE_BACKEND_API_URL}/api/posts` : `${import.meta.env.VITE_BACKEND_API_URL}/api/posts/${editingPost.id}`;
     const method = isNew ? 'POST' : 'PUT';
 
     const payload = {
@@ -1669,7 +1669,7 @@ export function Admin() {
                     variant="outline" 
                     onClick={async () => {
                       if(confirm("Seed database with dummy data?")) {
-                        const res = await fetch('/api/admin/seed', { method: 'POST' });
+                        const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/admin/seed`, { method: 'POST' });
                         if(res.ok) {
                           alert("Database seeded successfully!");
                           fetchData();

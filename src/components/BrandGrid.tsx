@@ -1,4 +1,4 @@
-import { BRANDS } from '@/constants';
+import { BRANDS } from '@/src/constants';
 
 export function BrandGrid() {
   return (

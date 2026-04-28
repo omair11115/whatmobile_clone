@@ -1,18 +1,18 @@
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { SEO } from '@/components/SEO';
-import { Sidebar } from '@/components/Sidebar';
-import { PhoneCard } from '@/components/PhoneCard';
+import { SEO } from '@/src/components/SEO';
+import { Sidebar } from '@/src/components/Sidebar';
+import { PhoneCard } from '@/src/components/PhoneCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Star, ChevronRight, Newspaper, Smartphone, Clock } from 'lucide-react';
-import { Mobile, BlogPost } from '@/types';
+import { Mobile, BlogPost } from '@/src/types';
 import { motion } from 'motion/react';
-import { useAuth } from '@/lib/auth';
-import { StarRating } from '@/components/StarRating';
-import { CommentSection } from '@/components/CommentSection';
+import { useAuth } from '@/src/lib/auth';
+import { StarRating } from '@/src/components/StarRating';
+import { CommentSection } from '@/src/components/CommentSection';
 
 export function PhoneDetail() {
   const { slug } = useParams();
@@ -37,15 +37,15 @@ export function PhoneDetail() {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch(`/api/mobiles/${slug}`)
+    fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles/${slug}`)
       .then(res => res.json())
       .then(data => {
         if (data && !data.error) {
           setPhone(data);
           // Fetch additional data
-          fetch(`/api/mobiles/${slug}/similar`).then(res => res.json()).then(setSimilarMobiles);
-          fetch(`/api/mobiles/${slug}/brand-related`).then(res => res.json()).then(setBrandMobiles);
-          fetch(`/api/posts/brand/${data.brand}`).then(res => res.json()).then(setBrandNews);
+          fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles/${slug}/similar`).then(res => res.json()).then(setSimilarMobiles);
+          fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles/${slug}/brand-related`).then(res => res.json()).then(setBrandMobiles);
+          fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/posts/brand/${data.brand}`).then(res => res.json()).then(setBrandNews);
         }
       })
       .catch(err => console.error(err))

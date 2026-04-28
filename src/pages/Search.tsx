@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SEO } from '@/components/SEO';
-import { PhoneCard } from '@/components/PhoneCard';
-import { Sidebar } from '@/components/Sidebar';
+import { SEO } from '@/src/components/SEO';
+import { PhoneCard } from '@/src/components/PhoneCard';
+import { Sidebar } from '@/src/components/Sidebar';
 import { Input } from '@/components/ui/input';
 import { Search as SearchIcon, SlidersHorizontal } from 'lucide-react';
-import { Mobile } from '@/types';
+import { Mobile } from '@/src/types';
 
 // Search page component
 export function Search() {
@@ -14,7 +14,7 @@ export function Search() {
   const [results, setResults] = useState<Mobile[]>([]);
 
   useEffect(() => {
-    fetch('/api/mobiles')
+    fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles`)
       .then(res => res.json())
       .then(data => {
         if (data && Array.isArray(data)) {

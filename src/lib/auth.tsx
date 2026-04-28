@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '@/types';
+import { User } from '@/src/types';
 
 interface AuthContextType {
   user: User | null;
@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      const res = await fetch('/api/auth/me');
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/me`);
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async () => {
     try {
-      const res = await fetch('/api/auth/google/url');
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/google/url`);
       if (res.ok) {
         const { url } = await res.json();
         const width = 600;
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithCredentials = async (username: string, password: string) => {
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      const res = await fetch('/api/auth/logout', { method: 'POST' });
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/logout`, { method: 'POST' });
       if (res.ok) {
         setUser(null);
       }

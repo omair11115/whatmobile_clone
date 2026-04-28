@@ -1,4 +1,4 @@
-import { SEO } from '@/components/SEO';
+import { SEO } from '@/src/components/SEO';
 import { Card, CardContent } from '@/components/ui/card';
 
 export function PrivacyPolicy() {

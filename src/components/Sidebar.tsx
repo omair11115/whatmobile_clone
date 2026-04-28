@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronRight, Filter, Smartphone, Wifi, Cpu, Monitor, Zap, Disc } from 'lucide-react';
-import { Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption } from '@/types';
+import { Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption } from '@/src/types';
 
 interface SidebarProps {
   showPriceFilters?: boolean;
@@ -19,13 +19,13 @@ export function Sidebar({ showPriceFilters = true, showFeatureFilters = true }: 
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/brands'),
-      fetch('/api/price-ranges'),
-      fetch('/api/networks'),
-      fetch('/api/ram-options'),
-      fetch('/api/screen-sizes'),
-      fetch('/api/mobile-features'),
-      fetch('/api/os-options'),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/brands`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/price-ranges`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/networks`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/ram-options`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/screen-sizes`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobile-features`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/os-options`),
     ])
       .then(async ([brandRes, priceRes, netRes, ramRes, screenRes, featRes, osRes]) => {
         const brandData = await brandRes.json();

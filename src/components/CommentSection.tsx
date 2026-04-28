@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Comment, User } from '@/types';
+import { Comment, User } from '@/src/types';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -123,7 +123,7 @@ export function CommentSection({ mobileId, postId, currentUser }: CommentSection
     if (!mobileId && !postId) return;
     setIsLoading(true);
     try {
-      const url = mobileId ? `/api/comments/${mobileId}` : `/api/comments/post/${postId}`;
+      const url = mobileId ? `${import.meta.env.VITE_BACKEND_API_URL}/api/comments/${mobileId}` : `${import.meta.env.VITE_BACKEND_API_URL}/api/comments/post/${postId}`;
       const res = await fetch(url);
       if (res.ok) {
         setComments(await res.json());
@@ -146,7 +146,7 @@ export function CommentSection({ mobileId, postId, currentUser }: CommentSection
 
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/comments', {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

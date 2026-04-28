@@ -1,12 +1,12 @@
 import { Smartphone, Facebook, Twitter, Instagram, Youtube, ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Brand } from '@/types';
+import { Brand } from '@/src/types';
 
 export function Footer() {
   const [brands, setBrands] = useState<Brand[]>([]);
 
   useEffect(() => {
-    fetch('/api/brands')
+    fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/brands`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
