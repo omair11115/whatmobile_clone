@@ -18,7 +18,7 @@ export function CategoryPage() {
     const fetchCategoryData = async () => {
       setIsLoading(true);
       try {
-        let apiUrl = '/api/mobiles';
+        let apiUrl = `${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles`;
         let pageTitle = 'Mobile Phones';
         const isPriceRange = location.pathname === '/price-range';
 
@@ -35,7 +35,7 @@ export function CategoryPage() {
           pageTitle = searchParams.get('label') || 'Price Range';
         } else if (type === 'network') {
           // Resolve slug to name
-          const res = await fetch('/api/networks');
+          const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/networks`);
           const networks = await res.json();
           const target = networks.find((n: any) => n.slug === slug);
           if (target) {
@@ -43,7 +43,7 @@ export function CategoryPage() {
             pageTitle = target.name;
           }
         } else if (type === 'ram') {
-          const res = await fetch('/api/ram-options');
+          const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/ram-options`);
           const options = await res.json();
           const target = options.find((o: any) => o.slug === slug);
           if (target) {
@@ -51,7 +51,7 @@ export function CategoryPage() {
             pageTitle = target.label;
           }
         } else if (type === 'screen') {
-          const res = await fetch('/api/screen-sizes');
+          const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/screen-sizes`);
           const sizes = await res.json();
           const target = sizes.find((s: any) => s.slug === slug);
           if (target) {
@@ -59,7 +59,7 @@ export function CategoryPage() {
             pageTitle = target.label;
           }
         } else if (type === 'os') {
-          const res = await fetch('/api/os-options');
+          const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/os-options`);
           const options = await res.json();
           const target = options.find((o: any) => o.slug === slug);
           if (target) {
@@ -67,7 +67,7 @@ export function CategoryPage() {
             pageTitle = target.name;
           }
         } else if (type === 'feature') {
-          const res = await fetch('/api/mobile-features');
+          const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobile-features`);
           const features = await res.json();
           const target = features.find((f: any) => f.slug === slug);
           if (target) {
@@ -78,7 +78,7 @@ export function CategoryPage() {
           }
         }
 
-        const res = await fetch(apiUrl);
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}${apiUrl}`);
         const data = await res.json();
         if (Array.isArray(data)) {
           setPhones(data);

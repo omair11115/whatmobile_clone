@@ -16,7 +16,7 @@ export function BlogDetail() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/posts/${slug}`)
+    fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/posts/${slug}`)
       .then(res => res.json())
       .then(data => {
         if (data && !data.error) {

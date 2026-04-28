@@ -6,7 +6,7 @@ export function Footer() {
   const [brands, setBrands] = useState<Brand[]>([]);
 
   useEffect(() => {
-    fetch('/api/brands')
+    fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/brands`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {

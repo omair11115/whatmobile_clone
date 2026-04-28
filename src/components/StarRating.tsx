@@ -21,7 +21,7 @@ export function StarRating({ mobileId, initialRating = 0, readOnly = false }: St
 
   const fetchRatings = async () => {
     try {
-      const res = await fetch(`/api/ratings/${mobileId}`);
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/ratings/${mobileId}`);
       if (res.ok) {
         const data = await res.json();
         setAvgRating(data.averageRating);
@@ -38,7 +38,7 @@ export function StarRating({ mobileId, initialRating = 0, readOnly = false }: St
 
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/ratings', {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/ratings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mobile_id: mobileId, rating: value })

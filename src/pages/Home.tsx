@@ -44,15 +44,15 @@ export function Home() {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/mobiles'),
-      fetch('/api/brands'),
-      fetch('/api/price-ranges'),
-      fetch('/api/networks'),
-      fetch('/api/ram-options'),
-      fetch('/api/screen-sizes'),
-      fetch('/api/mobile-features'),
-      fetch('/api/os-options'),
-      fetch('/api/posts')
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/brands`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/price-ranges`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/networks`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/ram-options`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/screen-sizes`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobile-features`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/os-options`),
+      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/posts`)
     ])
       .then(async ([mobRes, brandRes, priceRes, netRes, ramRes, screenRes, featRes, osRes, postRes]) => {
         const mobData = await mobRes.json();

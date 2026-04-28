@@ -37,15 +37,15 @@ export function PhoneDetail() {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch(`/api/mobiles/${slug}`)
+    fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles/${slug}`)
       .then(res => res.json())
       .then(data => {
         if (data && !data.error) {
           setPhone(data);
           // Fetch additional data
-          fetch(`/api/mobiles/${slug}/similar`).then(res => res.json()).then(setSimilarMobiles);
-          fetch(`/api/mobiles/${slug}/brand-related`).then(res => res.json()).then(setBrandMobiles);
-          fetch(`/api/posts/brand/${data.brand}`).then(res => res.json()).then(setBrandNews);
+          fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles/${slug}/similar`).then(res => res.json()).then(setSimilarMobiles);
+          fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles/${slug}/brand-related`).then(res => res.json()).then(setBrandMobiles);
+          fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/posts/brand/${data.brand}`).then(res => res.json()).then(setBrandNews);
         }
       })
       .catch(err => console.error(err))

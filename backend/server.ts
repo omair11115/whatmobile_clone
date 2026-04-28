@@ -1,6 +1,5 @@
 import "dotenv/config";
 import express from "express";
-import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import pool from './db';
@@ -10,6 +9,7 @@ import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import cookieParser from 'cookie-parser';
 import bcrypt from 'bcryptjs';
+import cors from 'cors';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret-for-dev';
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -53,13 +53,52 @@ async function fixExistingSlugs() {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT || 3001;
 
   // Trust proxy for ngrok and load balancers
   app.set('trust proxy', 1);
 
   // Run migrations
   await fixExistingSlugs();
+  
+    // ========== CORS CONFIGURATION - MUST BE BEFORE ROUTES ==========
+  const corsOptions = {
+    origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+      // Allow requests with no origin (like mobile apps, curl, postman)
+      if (!origin) return callback(null, true);
+
+      // List of allowed origins
+      const allowedOrigins = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        process.env.FRONTEND_URL,
+        process.env.APP_URL,
+      ].filter(Boolean);
+
+      // For ngrok or other dynamic URLs
+      const isNgrokUrl = origin.includes("ngrok-free.app") || origin.includes("ngrok.io");
+      const isAllowed = allowedOrigins.includes(origin) || isNgrokUrl;
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        console.warn(`CORS blocked request from origin: ${origin}`);
+        // For development - allow anyway
+        callback(null, true);
+      }
+    },
+    credentials: true, // Important for cookies
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Cookie"],
+    exposedHeaders: ["Set-Cookie"],
+    optionsSuccessStatus: 200,
+  };
+
+  // Apply CORS middleware FIRST
+  app.use(cors(corsOptions));
+  app.options("*", cors(corsOptions)); // Handle preflight requests
   
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -870,7 +909,7 @@ async function startServer() {
   // AI Generation Endpoints
   app.get("/api/ai/latest-launches", async (req, res) => {
     try {
-      const result = await genAI.models.generateContent({
+      const result:any = await genAI.models.generateContent({
         model: "gemini-1.5-flash",
         contents: "List 5 newly launched or upcoming mobile phones in 2025. Return only their names as a JSON array of strings.",
         config: {
@@ -928,7 +967,8 @@ async function startServer() {
           }
         }
       });
-      res.json(JSON.parse(result.text));
+      //@ts-ignore
+      res.json(JSON.parse(result.text) as any);
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
@@ -1566,21 +1606,6 @@ async function startServer() {
     console.warn(`[API 404] No match for: ${req.method} ${req.originalUrl}`);
     res.status(404).json({ error: `API route ${req.method} ${req.originalUrl} not found` });
   });
-
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-  }
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);

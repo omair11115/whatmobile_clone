@@ -14,7 +14,7 @@ export function Search() {
   const [results, setResults] = useState<Mobile[]>([]);
 
   useEffect(() => {
-    fetch('/api/mobiles')
+    fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/mobiles`)
       .then(res => res.json())
       .then(data => {
         if (data && Array.isArray(data)) {
