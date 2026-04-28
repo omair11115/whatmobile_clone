@@ -1,6 +1,6 @@
 import { Smartphone, Facebook, Twitter, Instagram, Youtube, ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Brand } from '@/src/types';
+import { Brand } from '@/types';
 
 export function Footer() {
   const [brands, setBrands] = useState<Brand[]>([]);

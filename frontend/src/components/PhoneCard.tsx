@@ -1,4 +1,4 @@
-import { Mobile } from '@/src/types';
+import { Mobile } from '@/types';
 
 interface PhoneCardProps {
   phone: Mobile;

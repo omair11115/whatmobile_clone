@@ -920,7 +920,7 @@ async function startServer() {
           }
         }
       });
-      res.json(JSON.parse(result.text));
+      res.json(JSON.parse(result.text || '[]'));
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
@@ -1607,8 +1607,8 @@ async function startServer() {
     res.status(404).json({ error: `API route ${req.method} ${req.originalUrl} not found` });
   });
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  app.listen(Number(PORT), "0.0.0.0", () => {
+    console.log(`Backend server running on http://localhost:${PORT}`);
   });
 }
 

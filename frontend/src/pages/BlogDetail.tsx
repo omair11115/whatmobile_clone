@@ -1,13 +1,13 @@
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { SEO } from '@/src/components/SEO';
-import { Sidebar } from '@/src/components/Sidebar';
+import { SEO } from '@/components/SEO';
+import { Sidebar } from '@/components/Sidebar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, User as UserIcon, Tag, Clock, MessageSquare } from 'lucide-react';
-import { BlogPost } from '@/src/types';
+import { BlogPost } from '@/types';
 import { format } from 'date-fns';
-import { useAuth } from '@/src/lib/auth';
-import { CommentSection } from '@/src/components/CommentSection';
+import { useAuth } from '@/lib/auth';
+import { CommentSection } from '@/components/CommentSection';
 
 export function BlogDetail() {
   const { slug } = useParams();

@@ -1,4 +1,4 @@
-import { BlogPost } from '@/src/types';
+import { BlogPost } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, User } from 'lucide-react';

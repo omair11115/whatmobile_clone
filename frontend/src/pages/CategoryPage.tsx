@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useLocation } from 'react-router-dom';
-import { PhoneCard } from '@/src/components/PhoneCard';
-import { Sidebar } from '@/src/components/Sidebar';
-import { SEO } from '@/src/components/SEO';
-import { Mobile } from '@/src/types';
-import { CATEGORIES } from '@/src/constants';
+import { PhoneCard } from '@/components/PhoneCard';
+import { Sidebar } from '@/components/Sidebar';
+import { SEO } from '@/components/SEO';
+import { Mobile } from '@/types';
+import { CATEGORIES } from '@/constants';
 
 export function CategoryPage() {
   const { type, slug } = useParams();

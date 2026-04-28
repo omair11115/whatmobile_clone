@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PhoneCard } from '@/src/components/PhoneCard';
-import { BlogCard } from '@/src/components/BlogCard';
-import { BrandGrid } from '@/src/components/BrandGrid';
-import { Sidebar } from '@/src/components/Sidebar';
-import { SEO } from '@/src/components/SEO';
+import { PhoneCard } from '@/components/PhoneCard';
+import { BlogCard } from '@/components/BlogCard';
+import { BrandGrid } from '@/components/BrandGrid';
+import { Sidebar } from '@/components/Sidebar';
+import { SEO } from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronRight, Zap, Star, Clock, Smartphone, Newspaper } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption } from '@/src/types';
-import { BRANDS } from '@/src/constants';
+import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption } from '@/types';
+import { BRANDS } from '@/constants';
 
 // Removed Mock Data Constants
 
@@ -217,6 +217,110 @@ export function Home() {
               </div>
               <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
                 {pkr40kTo50k.slice(0, 6).map(phone => (
+                  <PhoneCard key={phone.id} phone={phone} />
+                ))}
+              </div>
+            </section>
+
+            {/* Price Row 3: 30k - 40k */}
+            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices 30,000 - 40,000 Rs.</h2>
+                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {pkr30kTo40k.slice(0, 6).map(phone => (
+                  <PhoneCard key={phone.id} phone={phone} />
+                ))}
+              </div>
+            </section>
+
+            {/* Price Row 4: 20k - 30k */}
+            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices 20,001 - 30,000 Rs.</h2>
+                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {pkr20kTo30k.slice(0, 6).map(phone => (
+                  <PhoneCard key={phone.id} phone={phone} />
+                ))}
+              </div>
+            </section>
+
+            {/* Price Row 5: 10k - 20k */}
+            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices 10,001 - 20,000 Rs.</h2>
+                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {pkr10kTo20k.slice(0, 6).map(phone => (
+                  <PhoneCard key={phone.id} phone={phone} />
+                ))}
+              </div>
+            </section>
+
+            {/* Price Row 6: Under 10k */}
+            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices under 10,000 in Pakistan</h2>
+                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {pkrUnder10k.slice(0, 6).map(phone => (
+                  <PhoneCard key={phone.id} phone={phone} />
+                ))}
+              </div>
+            </section>
+
+            {/* Price Row 3: 30k - 40k */}
+            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices 30,000 - 40,000 Rs.</h2>
+                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {pkr30kTo40k.slice(0, 6).map(phone => (
+                  <PhoneCard key={phone.id} phone={phone} />
+                ))}
+              </div>
+            </section>
+
+            {/* Price Row 4: 20k - 30k */}
+            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices 20,001 - 30,000 Rs.</h2>
+                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {pkr20kTo30k.slice(0, 6).map(phone => (
+                  <PhoneCard key={phone.id} phone={phone} />
+                ))}
+              </div>
+            </section>
+
+            {/* Price Row 5: 10k - 20k */}
+            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices 10,001 - 20,000 Rs.</h2>
+                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {pkr10kTo20k.slice(0, 6).map(phone => (
+                  <PhoneCard key={phone.id} phone={phone} />
+                ))}
+              </div>
+            </section>
+
+            {/* Price Row 6: Under 10k */}
+            <section className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="bg-[#f8f9fa] border-b px-4 py-2 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-[#1a3a5a] uppercase tracking-tight">Mobile Prices under 10,000 in Pakistan</h2>
+                <a href="#" className="text-[10px] font-bold text-[#d32f2f] hover:underline">More {">>"}</a>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                {pkrUnder10k.slice(0, 6).map(phone => (
                   <PhoneCard key={phone.id} phone={phone} />
                 ))}
               </div>

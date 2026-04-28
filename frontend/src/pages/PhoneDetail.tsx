@@ -1,18 +1,18 @@
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { SEO } from '@/src/components/SEO';
-import { Sidebar } from '@/src/components/Sidebar';
-import { PhoneCard } from '@/src/components/PhoneCard';
+import { SEO } from '@/components/SEO';
+import { Sidebar } from '@/components/Sidebar';
+import { PhoneCard } from '@/components/PhoneCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Star, ChevronRight, Newspaper, Smartphone, Clock } from 'lucide-react';
-import { Mobile, BlogPost } from '@/src/types';
+import { Mobile, BlogPost } from '@/types';
 import { motion } from 'motion/react';
-import { useAuth } from '@/src/lib/auth';
-import { StarRating } from '@/src/components/StarRating';
-import { CommentSection } from '@/src/components/CommentSection';
+import { useAuth } from '@/lib/auth';
+import { StarRating } from '@/components/StarRating';
+import { CommentSection } from '@/components/CommentSection';
 
 export function PhoneDetail() {
   const { slug } = useParams();

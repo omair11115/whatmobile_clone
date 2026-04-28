@@ -1,6 +1,6 @@
 import React from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
-import { SEO } from '@/src/components/SEO';
+import { SEO } from '@/components/SEO';
 import { motion } from 'motion/react';
 
 export default function Contact() {

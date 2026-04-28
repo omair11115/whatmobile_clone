@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronRight, Filter, Smartphone, Wifi, Cpu, Monitor, Zap, Disc } from 'lucide-react';
-import { Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption } from '@/src/types';
+import { Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption } from '@/types';
 
 interface SidebarProps {
   showPriceFilters?: boolean;

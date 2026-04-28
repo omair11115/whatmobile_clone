@@ -7,8 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Smartphone, FileText, Settings, Image as ImageIcon, Copy, Check, Search, Type, CheckCircle, Zap, RefreshCw, Plus, Edit2, Trash2, LogOut } from 'lucide-react';
-import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption, GalleryImage, UserRole, ContentStatus } from '@/src/types';
-import { useAuth } from '@/src/lib/auth';
+import { Mobile, BlogPost, Brand, PriceRange, Network, RamOption, ScreenSize, MobileFeature, OsOption, GalleryImage, UserRole, ContentStatus } from '@/types';
+import { useAuth } from '@/lib/auth';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 

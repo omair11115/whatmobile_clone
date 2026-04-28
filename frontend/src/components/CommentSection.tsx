@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Comment, User } from '@/src/types';
+import { Comment, User } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
