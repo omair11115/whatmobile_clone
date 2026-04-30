@@ -8,3 +8,5 @@ coverage/
 .env*
 !.env.example
 backend/node_modules/.bin/bcrypt
+backend/.env
+backend/.env
